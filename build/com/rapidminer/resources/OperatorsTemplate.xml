@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<operators name="template" version="5.0"
+	docbundle="com/rapidminer/resources/i18n/OperatorsDocTemplate">
+	<group key="">
+		<group key="modeling">
+			<operator>
+				<key>lcm_test</key>
+				<class>com.rapidminer.lcmtest.LCMTest</class>
+				<replaces>lcm</replaces>
+			</operator>
+			<operator>
+				<key>plcm</key>
+				<class>com.rapidminer.lcm.Mainlcm</class>
+				<replaces>plcm</replaces>
+			</operator>
+		</group>
+	</group>
+</operators>
