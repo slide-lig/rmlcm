@@ -2,16 +2,31 @@
 <operators name="template" version="5.0"
 	docbundle="com/rapidminer/resources/i18n/OperatorsDocTemplate">
 	<group key="">
-		<group key="modeling">
+		<group key="LCM">
 			<operator>
-				<key>lcm_test</key>
-				<class>com.rapidminer.lcmtest.LCMTest</class>
+				<key>test</key>
+				<class>com.rapidminer.TestOp</class>
 				<replaces>lcm</replaces>
 			</operator>
 			<operator>
 				<key>plcm</key>
 				<class>com.rapidminer.lcm.Mainlcm</class>
 				<replaces>plcm</replaces>
+			</operator>
+			<operator>
+				<key>lCMReader</key>
+				<class>com.rapidminer.lcm.io.RMReader</class>
+				<replaces>lcmreader</replaces>
+			</operator>
+			<operator>
+				<key>lCMExecuter</key>
+				<class>com.rapidminer.lcm.PlcmAlgo</class>
+				<replaces>lcmexecuter</replaces>
+			</operator>
+			<operator>
+				<key>lCMMatcher</key>
+				<class>com.rapidminer.lcm.io.RMLCMMatcher</class>
+				<replaces>lcmmatcher</replaces>
 			</operator>
 		</group>
 	</group>

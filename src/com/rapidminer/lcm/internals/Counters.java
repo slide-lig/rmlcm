@@ -264,13 +264,16 @@ public final class Counters implements Cloneable {
 		int transactionsCounter = 0;
 		while (transactions.hasNext()) {
 			TransactionReader transaction = transactions.next();
+			//System.out.println("transactions loop is ok!!!");
 			transactionsCounter++;
 
 			while (transaction.hasNext()) {
+				//System.out.println("transaction loop is ok!!!");
 				int item = transaction.next();
-				biggestItemID = Math.max(biggestItemID, item);
+				biggestItemID = Math.max(biggestItemID, item);			
 				supportsMap.adjustOrPutValue(item, 1, 1);
 			}
+			//System.out.println("biggestItemID  "+biggestItemID);
 		}
 
 		this.transactionsCount = transactionsCounter;

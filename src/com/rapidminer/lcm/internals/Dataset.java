@@ -16,8 +16,7 @@
 	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 	See the License for the specific language governing permissions and
 	limitations under the License.
-*/
-
+ */
 
 package com.rapidminer.lcm.internals;
 
@@ -72,7 +71,8 @@ public class Dataset implements Cloneable {
 	 *            - highest item (exclusive) which will have a tidList. set to
 	 *            MAX_VALUE when using predictive pptest.
 	 */
-	Dataset(Counters counters, final Iterator<TransactionReader> transactions, int tidListBound) {
+	Dataset(Counters counters, final Iterator<TransactionReader> transactions,
+			int tidListBound) {
 
 		int maxTransId;
 
@@ -94,23 +94,32 @@ public class Dataset implements Cloneable {
 		// UByteConsecutiveItemsConcatenatedTidList(counters, tidListBound);
 		// } else
 		if (UShortConsecutiveItemsConcatenatedTidList.compatible(maxTransId)) {
-			this.tidLists = new UShortConsecutiveItemsConcatenatedTidList(counters, tidListBound);
+			this.tidLists = new UShortConsecutiveItemsConcatenatedTidList(
+					counters, tidListBound);
 		} else {
-			this.tidLists = new IntConsecutiveItemsConcatenatedTidList(counters, tidListBound);
+			this.tidLists = new IntConsecutiveItemsConcatenatedTidList(
+					counters, tidListBound);
 		}
 
 		TransactionsWriter writer = this.transactions.getWriter();
 		while (transactions.hasNext()) {
 			TransactionReader transaction = transactions.next();
-			if (transaction.getTransactionSupport() != 0 && transaction.hasNext()) {
-				final int transId = writer.beginTransaction(transaction.getTransactionSupport());
+			if (transaction.getTransactionSupport() != 0
+					&& transaction.hasNext()) {
+				final int transId = writer.beginTransaction(transaction
+						.getTransactionSupport());
 
 				while (transaction.hasNext()) {
-					final int item = transaction.next();
-					writer.addItem(item);
 
-					if (item < tidListBound) {
-						this.tidLists.addTransaction(item, transId);
+					int temp = transaction.next();
+					//if (temp >= 0) {
+						// final int item = transaction.next();
+						final int item = temp;
+						writer.addItem(item);
+
+						if (item < tidListBound) {
+							this.tidLists.addTransaction(item, transId);
+						//}
 					}
 				}
 
@@ -120,7 +129,8 @@ public class Dataset implements Cloneable {
 	}
 
 	public void compress(int coreItem) {
-		((PLCM.PLCMThread) Thread.currentThread()).counters[PLCMCounters.TransactionsCompressions.ordinal()]++;
+		((PLCM.PLCMThread) Thread.currentThread()).counters[PLCMCounters.TransactionsCompressions
+				.ordinal()]++;
 		this.transactions.compress(coreItem);
 	}
 
@@ -147,7 +157,8 @@ public class Dataset implements Cloneable {
 		return new TransactionsIterable(this.tidLists.getIterable(item));
 	}
 
-	public final class TransactionsIterable implements Iterable<TransactionReader> {
+	public final class TransactionsIterable implements
+			Iterable<TransactionReader> {
 		final TIntIterable tids;
 
 		public TransactionsIterable(TIntIterable tidList) {
@@ -160,7 +171,8 @@ public class Dataset implements Cloneable {
 		}
 	}
 
-	protected final class TransactionsIterator implements Iterator<TransactionReader> {
+	protected final class TransactionsIterator implements
+			Iterator<TransactionReader> {
 
 		protected final TIntIterator it;
 		private final ReusableTransactionIterator transIter;

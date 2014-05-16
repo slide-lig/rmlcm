@@ -202,7 +202,6 @@ public final class FileReader implements Iterator<TransactionReader> {
 	}
 	
 	private final class LineReader implements TransactionReader {
-
 		@Override
 		public int getTransactionSupport() {
 			return 1;

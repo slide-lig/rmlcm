@@ -23,12 +23,16 @@ package com.rapidminer.lcm.internals;
 
 import gnu.trove.map.hash.TIntIntHashMap;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 
+import com.rapidminer.example.ExampleSet;
 import com.rapidminer.lcm.internals.Dataset.TransactionsIterable;
 import com.rapidminer.lcm.internals.Selector.WrongFirstParentException;
-import com.rapidminer.lcm.io.FileReader;
+import com.rapidminer.lcm.internals.transactions.RMTransactions;
+import com.rapidminer.lcm.io.RMAdapter;
+import com.rapidminer.lcm.io.RPFileReader;
 import com.rapidminer.lcm.util.ItemsetsFactory;
 
 /**
@@ -69,6 +73,8 @@ public final class ExplorationStep implements Cloneable {
 	 * are non-first-parent items associated to their actual first parent.
 	 */
 	private final TIntIntHashMap failedFPTests;
+	
+	//private ArrayList<String> consoleStep;
 
 	/**
 	 * Start exploration on a dataset contained in a file.
@@ -78,16 +84,34 @@ public final class ExplorationStep implements Cloneable {
 	 *            to an input file in ASCII format. Each line should be a
 	 *            transaction containing space-separated item IDs.
 	 */
-	public ExplorationStep(int minimumSupport, String path) {
+	
+	//TODO
+	//Change public ExplorationStep(int minimumSupport, String path) -> ExplorationStep(int minimumSupport, ExampleSet exampleSet)
+	public ExplorationStep(int minimumSupport, RMTransactions dataSet) {
 		this.core_item = Integer.MAX_VALUE;
 		this.selectChain = null;
 
-		FileReader reader = new FileReader(path);
+		/**
+		 * change the reader as a rapidminer reader to read exampleSet
+		 * */
+		//consoleStep= new ArrayList<String>();
+		
+		String console = null;
+		
+		//FileReader reader = new FileReader(path);
+		
+		//RPFileReader reader = new RPFileReader(dataSet);
+		RMAdapter reader = new RMAdapter(dataSet);
+		
 		this.counters = new Counters(minimumSupport, reader);
-		reader.close(this.counters.renaming);
+		
+		//no longer needs reader.close(); because using the reader of exampleSet, dataSet saved already in the memory. 
+		reader.setRenaming(this.counters.renaming);
 
 		this.pattern = this.counters.closure;
-
+		
+		reader.reset();
+		//System.out.println("hhhhhhhhhhhhhhhhh");
 		this.dataset = new Dataset(this.counters, reader);
 
 		this.candidates = this.counters.getExtensionsIterator();
@@ -178,11 +202,24 @@ public final class ExplorationStep implements Cloneable {
 		int[] reverseRenaming = parent.counters.reverseRenaming;
 
 		if (verbose) {
+			
+			StringBuffer infoBuffer = new StringBuffer();
+			
+			if (parent.pattern.length == 0 || ultraVerbose) {
+				infoBuffer.append(Calendar.getInstance()+" ");
+				infoBuffer.append(Thread.currentThread().getId()+" ");
+				infoBuffer.append(Arrays.toString(parent.pattern)+" ");
+				infoBuffer.append(reverseRenaming[extension]+" ");
+				
+				//consoleStep.add(infoBuffer.toString());
+			}
+			
 			if (parent.pattern.length == 0 || ultraVerbose) {
 				System.err
 						.format("{\"time\":\"%1$tY/%1$tm/%1$td %1$tk:%1$tM:%1$tS\",\"thread\":%2$d,\"pattern\":%3$s,\"extension_internal\":%4$d,\"extension\":%5$d}\n",
 								Calendar.getInstance(), Thread.currentThread().getId(),
 								Arrays.toString(parent.pattern), extension, reverseRenaming[extension]);
+				
 			}
 		}
 
@@ -234,6 +271,15 @@ public final class ExplorationStep implements Cloneable {
 		return null;
 	}
 
+	
+//	public ArrayList<String> getConsoleStep() {
+//		return consoleStep;
+//	}
+//
+//	public void setConsoleStep(ArrayList<String> consoleStep) {
+//		this.consoleStep = consoleStep;
+//	}
+	
 	public int getFailedFPTest(final int item) {
 		synchronized (this.failedFPTests) {
 			return this.failedFPTests.get(item);

@@ -2,24 +2,17 @@ package com.rapidminer.lcmtest;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.Properties;
 
 import com.rapidminer.example.Attribute;
-import com.rapidminer.example.AttributeRole;
 import com.rapidminer.example.Attributes;
 import com.rapidminer.example.Example;
 import com.rapidminer.example.ExampleSet;
-import com.rapidminer.example.Statistics;
 import com.rapidminer.example.table.AttributeFactory;
 import com.rapidminer.example.table.DataRow;
 import com.rapidminer.example.table.DataRowFactory;
-import com.rapidminer.example.table.DoubleArrayDataRow;
 import com.rapidminer.example.table.MemoryExampleTable;
-import com.rapidminer.gui.properties.SettingsChangeListener;
 import com.rapidminer.operator.Operator;
 import com.rapidminer.operator.OperatorDescription;
 import com.rapidminer.operator.OperatorException;

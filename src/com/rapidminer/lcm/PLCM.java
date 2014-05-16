@@ -26,41 +26,41 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
-import org.apache.commons.cli.PosixParser;
-import org.w3c.dom.Element;
 
-import com.rapidminer.io.process.XMLTools;
+import com.rapidminer.example.Attribute;
+import com.rapidminer.example.ExampleSet;
+import com.rapidminer.example.table.AttributeFactory;
+import com.rapidminer.example.table.DataRow;
+import com.rapidminer.example.table.DataRowFactory;
+import com.rapidminer.example.table.MemoryExampleTable;
 import com.rapidminer.lcm.internals.ExplorationStep;
+import com.rapidminer.lcm.internals.transactions.RMTransactions;
 import com.rapidminer.lcm.io.MultiThreadedFileCollector;
 import com.rapidminer.lcm.io.NullCollector;
 import com.rapidminer.lcm.io.PatternSortCollector;
 import com.rapidminer.lcm.io.PatternsCollector;
+import com.rapidminer.lcm.io.RPCollector;
 import com.rapidminer.lcm.io.StdOutCollector;
+import com.rapidminer.lcm.obj.ExecuteInformationsIOObject;
+import com.rapidminer.lcm.obj.SupportPatternObject;
 import com.rapidminer.lcm.util.MemoryPeakWatcherThread;
 import com.rapidminer.lcm.util.ProgressWatcherThread;
-import com.rapidminer.operator.Operator;
-import com.rapidminer.operator.OperatorDescription;
-import com.rapidminer.operator.OperatorException;
 import com.rapidminer.operator.ports.OutputPort;
-import com.rapidminer.parameter.ParameterType;
-import com.rapidminer.parameter.ParameterTypeString;
-import com.rapidminer.tools.XMLException;
-import com.rapidminer.tools.plugin.Plugin;
+import com.rapidminer.tools.Ontology;
 
 /**
  * LCM implementation, based on UnoAUA04 :
  * "An Efficient Algorithm for Enumerating Closed Patterns in Transaction Databases"
  * by Takeaki Uno el. al.
  */
-public class PLCM{
+public class PLCM {
 	final List<PLCMThread> threads;
 	private ProgressWatcherThread progressWatch;
 	protected static long chrono;
@@ -68,7 +68,11 @@ public class PLCM{
 	private final PatternsCollector collector;
 
 	private final long[] globalCounters;
-	
+
+	public static ConcurrentHashMap<Integer, String> RMres = new ConcurrentHashMap<Integer, String>();;
+
+	// private static boolean startMemoryWatch;
+
 	public PLCM(PatternsCollector patternsCollector, int nbThreads) {
 		if (nbThreads < 1) {
 			throw new IllegalArgumentException(
@@ -79,9 +83,9 @@ public class PLCM{
 		this.createThreads(nbThreads);
 		this.globalCounters = new long[PLCMCounters.values().length];
 		this.progressWatch = new ProgressWatcherThread();
+		// this.startMemoryWatch=startMemoryWatch;
 	}
 
-	
 	void createThreads(int nbThreads) {
 		for (int i = 0; i < nbThreads; i++) {
 			this.threads.add(new PLCMThread(i));
@@ -151,6 +155,7 @@ public class PLCM{
 			PLCMCounters counter = counters[i];
 
 			builder.append(", \"");
+			builder.append("\n");
 			builder.append(counter.toString());
 			builder.append("\":");
 			builder.append(this.globalCounters[i]);
@@ -159,6 +164,7 @@ public class PLCM{
 		if (additionalCounters != null) {
 			for (Entry<String, Long> entry : additionalCounters.entrySet()) {
 				builder.append(", \"");
+				builder.append("\n");
 				builder.append(entry.getKey());
 				builder.append("\":");
 				builder.append(entry.getValue());
@@ -266,7 +272,9 @@ public class PLCM{
 
 				} else { // our list was empty, we should steal from another
 							// thread
+
 					ExplorationStep stolj = stealJob(this);
+
 					if (stolj == null) {
 						exit = true;
 					} else {
@@ -282,49 +290,9 @@ public class PLCM{
 			this.lock.writeLock().lock();
 			this.stackedJobs.add(state);
 			this.lock.writeLock().unlock();
+
 		}
 	}
-
-	// public static void main(String[] args) throws Exception {
-	//
-	// Options options = new Options();
-	// CommandLineParser parser = new PosixParser();
-	//
-	// options.addOption(
-	// "b",
-	// false,
-	// "Benchmark mode : patterns are not outputted at all (in which case OUTPUT_PATH is ignored)");
-	// options.addOption("h", false, "Show help");
-	// options.addOption(
-	// "m",
-	// false,
-	// "Give peak memory usage after mining (instanciates a watcher thread that periodically triggers garbage collection)");
-	// options.addOption("s", false,
-	// "Sort items in outputted patterns, in ascending order");
-	// options.addOption(
-	// "t",
-	// true,
-	// "How many threads will be launched (defaults to your machine's processors count)");
-	// options.addOption("v", false,
-	// "Enable verbose mode, which logs every extension of the empty pattern");
-	// options.addOption(
-	// "V",
-	// false,
-	// "Enable ultra-verbose mode, which logs every pattern extension (use with care: it may produce a LOT of output)");
-	//
-	// try {
-	// CommandLine cmd = parser.parse(options, args);
-	//
-	// if (cmd.getArgs().length < 2 || cmd.getArgs().length > 3
-	// || cmd.hasOption('h')) {
-	// printMan(options);
-	// } else {
-	// standalone(cmd);
-	// }
-	// } catch (ParseException e) {
-	// printMan(options);
-	// }
-	// }
 
 	public static void printMan(Options options) {
 		String syntax = "java fr.liglab.mining.PLCM [OPTIONS] INPUT_PATH MINSUP [OUTPUT_PATH]";
@@ -337,67 +305,86 @@ public class PLCM{
 		formatter.printHelp(80, syntax, header, options, footer);
 	}
 
-	public static void standalone(CommandLine cmd,PLCM miner) {
-		String[] args = cmd.getArgs();
-		int minsup = Integer.parseInt(args[1]);
+	/**
+	 * It should be 3 arguments for the execution command line 1. input path 2.
+	 * support 3. output path
+	 * 
+	 * but I replaced the input path as a exampleSet which was read already by a
+	 * Operator of rapidminer so I add the third parameter 'ExampleSet
+	 * exampleSet'
+	 * 
+	 * @param output
+	 * */
+	// public static void standalone(CommandLine cmd, RMTransactions dataSet,
+	public static void standalone(String support, String fileLocation,
+			RMTransactions dataSet, PLCM miner, OutputPort output,
+			OutputPort consoleOutpout, boolean showThreadNb,
+			boolean startMemoryWatch, boolean verboseMode,
+			boolean ultraVerboseMode) {
+		// String[] args = cmd.getArgs();
+		int nbThreads = 0;
+
+		// int minsup = Integer.parseInt(args[1]);
+		int minsup = Integer.parseInt(support);
+
 		MemoryPeakWatcherThread memoryWatch = null;
 
-		String outputPath = null;
-		if (args.length >= 3) {
-			outputPath = args[2];
-		}
+		// String outputPath = null;
+		// if (args.length >= 3) {
+		// outputPath = args[2];
+		// }
+		// String outputPath = fileLocation;
 
-		if (cmd.hasOption('m')) {
+		if (startMemoryWatch) {
 			memoryWatch = new MemoryPeakWatcherThread();
 			memoryWatch.start();
 		}
 
 		chrono = System.currentTimeMillis();
-		ExplorationStep initState = new ExplorationStep(minsup, args[0]);
+		// TODO
+		/*
+		 * Change new ExplorationStep(minsup, args[0])-> new
+		 * ExplorationStep(minsup, exampleset) *
+		 */
+		// ExplorationStep initState = new ExplorationStep(minsup, args[0]);
+
+		// OK
+		// for (ArrayList<String> ts : dataSet.getTransactions()) {
+		// for (String string : ts) {
+		// System.out.println(string+"                   test");
+		// }
+		// }
+		//
+
+		ExplorationStep initState = new ExplorationStep(minsup, dataSet);
+
 		long loadingTime = System.currentTimeMillis() - chrono;
 		System.err.println("Dataset loaded in " + loadingTime + "ms");
 
-		if (cmd.hasOption('V')) {
+		// PatternsCollector collector = new RPCollector(); // TODO new
+		// PatternsCollector for RapidMiner
+		// utiliser initState.counters.getReverseRenaming()
+
+		// PatternsCollector collector = new StdOutCollector();
+		// initState.counters.getReverseRenaming();
+		// PLCM miner = new PLCM(collector, 1);
+		if (ultraVerboseMode) {
 			ExplorationStep.verbose = true;
 			ExplorationStep.ultraVerbose = true;
-		} else if (cmd.hasOption('v')) {
+		} else if (verboseMode) {
 			ExplorationStep.verbose = true;
 		}
 
-//		int nbThreads = Runtime.getRuntime().availableProcessors();
-//		if (cmd.hasOption('t')) {
-//			nbThreads = Integer.parseInt(cmd.getOptionValue('t'));
-//		}
-//
-//		PatternsCollector collector = instanciateCollector(cmd, outputPath,
-//				nbThreads);
-
-		
-		
-		// new OperatorDescription
-		// PLCM miner = null;
-		// Element element = null;
-		// ClassLoader classLoader = null;
-		// Plugin provider = null;																													
-		// Class<?> generatedClass;
-		// generatedClass = Class.forName(
-		// XMLTools.getTagContents(element, "class", true).trim(), true,
-		// classLoader);
-		//
-		// OperatorDescription operatorDescription = new OperatorDescription(
-		// "modeling", "lcm_test_1",
-		// (Class<? extends Operator>) generatedClass, classLoader, "lcm",
-		// provider);
-			
-		//PLCM miner = new PLCM(collector, nbThreads);
-	
+		// PLCM miner = new PLCM(collector, nbThreads);
 
 		chrono = System.currentTimeMillis();
 		miner.lcm(initState);
 		chrono = System.currentTimeMillis() - chrono;
+
 		Map<String, Long> additionalCounters = new HashMap<String, Long>();
 		additionalCounters.put("miningTime", chrono);
 		additionalCounters.put("outputtedPatterns", miner.collector.close());
+
 		additionalCounters.put("loadingTime", loadingTime);
 		additionalCounters.put("avgPatternLength",
 				(long) miner.collector.getAveragePatternLength());
@@ -408,7 +395,67 @@ public class PLCM{
 					memoryWatch.getMaxUsedMemory());
 		}
 
+		// (RPCollector)collector
 		System.err.println(miner.toString(additionalCounters));
+
+		// PatternsCollector pc=miner.collector;
+
+		resSubConsole(nbThreads, miner.toString(additionalCounters),
+				consoleOutpout);
+
+		// RPCollector rp = (RPCollector) miner.collector;
+		// rp.showResultView(output);
+		resConsole(miner, output);
+	}
+
+	public static void resSubConsole(Integer nbThreads, String info,
+			OutputPort consoleOutput) {
+		ArrayList<String> verboseConsoles = null;
+
+		ExecuteInformationsIOObject executeInfo = collectExecuteInformations(
+				nbThreads, info, verboseConsoles);
+
+		consoleOutput.deliver(executeInfo);
+		// collectExecuteInformations(null, null);
+	}
+
+	public static void resConsole(PLCM miner, OutputPort output) {
+
+		if (miner.collector instanceof RPCollector) {
+			PatternsCollector rpc;
+			rpc = (RPCollector) miner.collector;
+		}
+		
+		Attribute[] newAttributes = new Attribute[2];
+
+		newAttributes[0] = AttributeFactory.createAttribute("support",
+				Ontology.INTEGER);
+		newAttributes[1] = AttributeFactory.createAttribute("Pattern",
+				Ontology.STRING);
+
+		MemoryExampleTable table = new MemoryExampleTable(newAttributes);
+
+		DataRowFactory ROW_FACTORY = new DataRowFactory(0, '.');
+		// DataRowFactory row = new DataRowFactory(type, decimalPointCharacter)
+
+		String[] patterns = new String[2];
+		for (SupportPatternObject knowing : ((RPCollector) miner.collector).getRes()) {
+			// for (Entry<Integer, String> knowing : RMres.entrySet()) {
+			patterns[0] = knowing.getSupport().toString();
+			patterns[1] = knowing.getPattern();
+			DataRow row = ROW_FACTORY.create(patterns, newAttributes);
+			table.addDataRow(row);
+		}
+
+		ExampleSet resultExampleSet = table.createExampleSet();
+
+		output.deliver(resultExampleSet);
+		// return rpc.getRMResult();
+	}
+
+	public static ExecuteInformationsIOObject collectExecuteInformations(
+			Integer nbThreads, String info, ArrayList<String> verboseConsoles) {
+		return new ExecuteInformationsIOObject(nbThreads, info, verboseConsoles);
 	}
 
 	/**
@@ -416,34 +463,34 @@ public class PLCM{
 	 * 
 	 * @param nbThreads
 	 */
-	
-	//changed private -> public
-	// private static PatternsCollector instanciateCollector(CommandLine cmd,
-	// String outputPath, int nbThreads) {
-	//
-	// PatternsCollector collector = null;
-	//
-	// if (cmd.hasOption('b')) {
-	// collector = new NullCollector();
-	// } else {
-	// if (outputPath != null) {
-	// try {
-	// collector = new MultiThreadedFileCollector(outputPath,
-	// nbThreads);
-	// } catch (IOException e) {
-	// e.printStackTrace(System.err);
-	// System.err.println("Aborting mining.");
-	// System.exit(1);
-	// }
-	// } else {
-	// collector = new StdOutCollector();
-	// }
-	//
-	// if (cmd.hasOption('s')) {
-	// collector = new PatternSortCollector(collector);
-	// }
-	// }
-	//
-	// return collector;
-	// }
+
+	// changed private -> public
+	private static PatternsCollector instanciateCollector(CommandLine cmd,
+			String outputPath, int nbThreads) {
+
+		PatternsCollector collector = null;
+
+		if (cmd.hasOption('b')) {
+			collector = new NullCollector();
+		} else {
+			if (outputPath != null) {
+				try {
+					collector = new MultiThreadedFileCollector(outputPath,
+							nbThreads);
+				} catch (IOException e) {
+					e.printStackTrace(System.err);
+					System.err.println("Aborting mining.");
+					System.exit(1);
+				}
+			} else {
+				collector = new StdOutCollector();
+			}
+
+			if (cmd.hasOption('s')) {
+				collector = new PatternSortCollector(collector);
+			}
+		}
+
+		return collector;
+	}
 }
