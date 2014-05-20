@@ -20,17 +20,32 @@
 
 package com.rapidminer.lcm.io;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+
+import com.rapidminer.lcm.obj.SupportPatternObject;
 
 public class StdOutCollector implements PatternsCollector {
 
 	protected long collected = 0;
 	protected long collectedLength = 0;
+	private int[] table;
+	private ArrayList<int[]> res = new ArrayList<int[]>();
+
+	// private SupportPatternObject spobj;
+	// private ArrayList<SupportPatternObject> res = new
+	// ArrayList<SupportPatternObject>();
 
 	@Override
 	synchronized public void collect(final int support, final int[] pattern) {
 		System.out.println(Integer.toString(support) + "\t"
 				+ Arrays.toString(pattern));
+
+		// spobj = new SupportPatternObject(support, Arrays.toString(pattern));
+		// res.add(spobj);
+
+		table = this.createTransactionLine(support, pattern);
+		res.add(table);
 		this.collected++;
 		this.collectedLength += pattern.length;
 	}
@@ -48,8 +63,23 @@ public class StdOutCollector implements PatternsCollector {
 			return (int) (this.collectedLength / this.collected);
 		}
 	}
-	
-	public int test(){
+
+	public int test() {
 		return 1;
 	}
+
+	@Override
+	public ArrayList<int[]> getRes() {
+		return res;
+	}
+
+	public int[] createTransactionLine(int support, int[] pattern) {
+		int[] table = new int[pattern.length + 2];
+		table[0] = support;
+		for (int i = 1; i < table.length - 1; i++) {
+			table[i] = pattern[i - 1];
+		}
+		return table;
+	}
+
 }

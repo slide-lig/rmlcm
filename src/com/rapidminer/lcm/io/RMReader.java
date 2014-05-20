@@ -10,7 +10,6 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 
 import com.rapidminer.example.Attribute;
@@ -19,7 +18,6 @@ import com.rapidminer.example.table.AttributeFactory;
 import com.rapidminer.example.table.DataRow;
 import com.rapidminer.example.table.DataRowFactory;
 import com.rapidminer.example.table.MemoryExampleTable;
-import com.rapidminer.gui.tools.dialogs.wizards.dataimport.csv.CSVImportWizard.CSVDataReaderWizardCreator;
 import com.rapidminer.lcm.internals.transactions.RMTransaction;
 import com.rapidminer.lcm.internals.transactions.RMTransactions;
 import com.rapidminer.operator.Operator;
@@ -29,7 +27,6 @@ import com.rapidminer.operator.UserError;
 import com.rapidminer.operator.ports.OutputPort;
 import com.rapidminer.parameter.ParameterType;
 import com.rapidminer.parameter.ParameterTypeBoolean;
-import com.rapidminer.parameter.ParameterTypeConfiguration;
 import com.rapidminer.parameter.ParameterTypeFile;
 import com.rapidminer.parameter.ParameterTypeString;
 import com.rapidminer.parameter.UndefinedParameterError;
@@ -40,7 +37,7 @@ public class RMReader extends Operator {
 
 	private static final String FILE_LOCATION = "file";
 
-	private static final String testFile = "test";
+	// private static final String testFile = "test";
 
 	private static final String useRegex = "Special Separator";
 	private static final String regex = "regex";
@@ -62,7 +59,7 @@ public class RMReader extends Operator {
 
 	public void readFile() {
 		// transactions = new ArrayList<RMTransaction>();
-		String fileLocation = null;
+		// String fileLocation = null;
 		lengths = new ArrayList<Integer>();
 		// try {
 		// File newfile = this.getParameterAsFile(FILE_LOCATION);
@@ -81,7 +78,7 @@ public class RMReader extends Operator {
 		BufferedInputStream bufferInput = null;
 		try {
 			File file = this.getParameterAsFile(FILE_LOCATION);
-			
+
 			bufferInput = new BufferedInputStream(new FileInputStream(file),
 					10 * 1024 * 1024);
 		} catch (FileNotFoundException e) {
@@ -111,6 +108,10 @@ public class RMReader extends Operator {
 						lineRegex = "\\s";
 					} else {
 						lineRegex = this.getParameterAsString(regex);
+						if (lineRegex.isEmpty() || lineRegex.equals(null)
+								|| lineRegex == null) {
+							lineRegex = "\\s";
+						}
 					}
 					String[] newline = this.splitTransaction(line, lineRegex);
 					// String[] newline = line.split("\\s");
@@ -125,9 +126,9 @@ public class RMReader extends Operator {
 					lengths.add(transaction.size());
 					transactions.add(transaction);
 				}
-				// System.out.println("____________________________");
 			}
 
+			input.close();
 		} catch (IOException e) {
 			System.err.println("can't read this line!");
 			e.printStackTrace();
@@ -169,7 +170,7 @@ public class RMReader extends Operator {
 			Arrays.fill(data, null);
 			for (int j = 0; j < transactions.getTransactions().get(i).size(); j++) {
 				data[j] = Integer.valueOf(transactions.getTransactions().get(i)
-						.get(j));
+						.get(j).trim());
 			}
 			DataRow dataRow = ROW_FACTORY.create(data, attributes);
 			table.addDataRow(dataRow);
@@ -181,6 +182,9 @@ public class RMReader extends Operator {
 
 	public int getLengthOfLongestTransaction(RMTransactions transactions) {
 		Collections.sort(this.lengths);
+		if(lengths.size()==0){
+			return 1;
+		}
 		return lengths.get(lengths.size() - 1);
 	}
 

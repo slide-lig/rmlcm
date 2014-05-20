@@ -1,7 +1,6 @@
 package com.rapidminer.lcm;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -16,7 +15,7 @@ import com.rapidminer.lcm.io.MultiThreadedFileCollector;
 import com.rapidminer.lcm.io.NullCollector;
 import com.rapidminer.lcm.io.PatternSortCollector;
 import com.rapidminer.lcm.io.PatternsCollector;
-import com.rapidminer.lcm.io.RPCollector;
+import com.rapidminer.lcm.io.RMCollector;
 import com.rapidminer.lcm.io.StdOutCollector;
 import com.rapidminer.lcm.obj.ExecuteInformationsIOObject;
 import com.rapidminer.operator.OperatorChain;
@@ -265,7 +264,7 @@ public class Mainlcm extends OperatorChain {
 				System.exit(1);
 			}
 		} else
-			collector = new RPCollector();
+			collector = new RMCollector();
 		return collector;
 	}
 

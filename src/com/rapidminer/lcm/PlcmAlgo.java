@@ -1,21 +1,25 @@
 package com.rapidminer.lcm;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.Options;
-
+import com.rapidminer.example.Attribute;
+import com.rapidminer.example.ExampleSet;
+import com.rapidminer.example.table.AttributeFactory;
+import com.rapidminer.example.table.DataRow;
+import com.rapidminer.example.table.DataRowFactory;
+import com.rapidminer.example.table.MemoryExampleTable;
 import com.rapidminer.lcm.internals.transactions.RMTransactions;
 import com.rapidminer.lcm.io.MultiThreadedFileCollector;
-import com.rapidminer.lcm.io.NullCollector;
-import com.rapidminer.lcm.io.PatternSortCollector;
 import com.rapidminer.lcm.io.PatternsCollector;
-import com.rapidminer.lcm.io.RPCollector;
-import com.rapidminer.lcm.io.StdOutCollector;
+import com.rapidminer.lcm.io.RMCollector;
 import com.rapidminer.operator.Operator;
 import com.rapidminer.operator.OperatorDescription;
 import com.rapidminer.operator.OperatorException;
+import com.rapidminer.operator.nio.file.WriteFileOperator;
 import com.rapidminer.operator.ports.InputPort;
 import com.rapidminer.operator.ports.OutputPort;
 import com.rapidminer.parameter.ParameterType;
@@ -24,6 +28,7 @@ import com.rapidminer.parameter.ParameterTypeInt;
 import com.rapidminer.parameter.ParameterTypeString;
 import com.rapidminer.parameter.UndefinedParameterError;
 import com.rapidminer.parameter.conditions.BooleanParameterCondition;
+import com.rapidminer.tools.Ontology;
 
 public class PlcmAlgo extends Operator {
 
@@ -38,7 +43,8 @@ public class PlcmAlgo extends Operator {
 	// private static final String dataset = "dataset";
 	private static final String threshold = "Support";
 
-	private static final String results = "Result file location";
+	private static final String beginWriteFile = "Write Mining Result As File(s)";
+	private static final String results = "Result File Location";
 
 	private static final String useThread = "Thread usage";
 	private static final String threads = "Threads number";
@@ -48,6 +54,9 @@ public class PlcmAlgo extends Operator {
 	private static final String verbose = "verbose mode";
 
 	private static final String ultraVerbose = "ultra-verbose mode";
+
+	private Attribute[] attributes;
+	private Integer[] stdTransactionline;
 
 	// public static final String PARAMETERFREQUENCY = " frequency ";
 
@@ -76,11 +85,19 @@ public class PlcmAlgo extends Operator {
 			boolean startMemoryWatch = false;
 			boolean verboseMode = false;
 			boolean ultraVerboseMode = false;
+			boolean writeFile = false;
+
+			// boolean writeFile = false;
 
 			// arguments[0] = this.getParameter(operation);
 			// arguments[1] = this.getParameter(dataset);
 			support = this.getParameter(threshold);
-			outputLocation = this.getParameter(results);
+
+			writeFile = this.getParameterAsBoolean(beginWriteFile);
+
+			if (writeFile) {
+				outputLocation = this.getParameter(results);
+			}
 
 			showThreadNb = this.getParameterAsBoolean(useThread);
 			threadsNb = this.getParameterAsInt(threads);
@@ -89,9 +106,13 @@ public class PlcmAlgo extends Operator {
 			verboseMode = this.getParameterAsBoolean(verbose);
 			ultraVerboseMode = this.getParameterAsBoolean(ultraVerbose);
 
-			if (outputLocation.isEmpty() || outputLocation.equals(" ")
-					|| outputLocation.matches("\\s")) {
-				outputLocation = null;
+			// writeFile = this.getParameterAsBoolean(beginWriteFile);
+
+			if (outputLocation != null) {
+				if (outputLocation.isEmpty() || outputLocation.equals(" ")
+						|| outputLocation.matches("\\s")) {
+					outputLocation = null;
+				}
 			}
 
 			this.doLcm(support, outputLocation, dataSet, showThreadNb,
@@ -128,6 +149,7 @@ public class PlcmAlgo extends Operator {
 				verbose,
 				"Enable verbose mode, which logs every extension of the empty pattern",
 				false, false));
+
 		types.add(new ParameterTypeBoolean(
 				ultraVerbose,
 				"Enable ultra-verbose mode, which logs every pattern extension (use with care: it may produce a LOT of output)",
@@ -135,12 +157,21 @@ public class PlcmAlgo extends Operator {
 
 		types.add(new ParameterTypeString(threshold, "threshold", "1", false));
 
-		types.add(new ParameterTypeString(results, "Location of output files",
-				" ", false));
+		types.add(new ParameterTypeBoolean(
+				beginWriteFile,
+				"if checked, you can input a location and name of file(s) for mining results, the number of file depend the number of thread that you used",
+				false, false));
+
+		ParameterType outFileType = new ParameterTypeString(results,
+				"Location of output file(s) that you want to generate", false);
+
+		outFileType.registerDependencyCondition(new BooleanParameterCondition(
+				this, beginWriteFile, true, true));
 
 		threadsType.registerDependencyCondition(new BooleanParameterCondition(
 				this, useThread, true, true));
 
+		types.add(outFileType);
 		types.add(threadsType);
 
 		return types;
@@ -153,12 +184,12 @@ public class PlcmAlgo extends Operator {
 			boolean ultraVerboseMode) {
 
 		int nbThreads = Runtime.getRuntime().availableProcessors();
-//		Options options = new Options();
-//		options.addOption(
-//				"b",
-//				false,
-//				"Benchmark mode : patterns are not outputted at all (in which case OUTPUT_PATH is ignored)");
-//		options.addOption("h", false, "Show help");
+		// Options options = new Options();
+		// options.addOption(
+		// "b",
+		// false,
+		// "Benchmark mode : patterns are not outputted at all (in which case OUTPUT_PATH is ignored)");
+		// options.addOption("h", false, "Show help");
 
 		// CommandLine cmd;
 
@@ -167,8 +198,10 @@ public class PlcmAlgo extends Operator {
 		outputPath = outputLocation;
 		nbThreads = threadsNb;
 
-		// PatternsCollector collector = initCollector(outputPath, nbThreads);
-		PatternsCollector collector = initCollector(null, nbThreads);
+		System.out.println(outputPath);
+
+		PatternsCollector collector = initCollector(outputPath, nbThreads);
+		// PatternsCollector collector = initCollector(null, nbThreads);
 
 		PLCM miner = new PLCM(collector, nbThreads);
 
@@ -177,6 +210,9 @@ public class PlcmAlgo extends Operator {
 		PLCM.standalone(support, outputLocation, dataSet, miner, output,
 				infoOutput, showThreadNb, startMemoryWatch, verboseMode,
 				ultraVerboseMode);
+
+		createAttributes(PLCM.getResList());
+		createExampleTable(attributes, output);
 		// PLCM.getResConsole(miner);
 		// PLCM.printMan(options);
 	}
@@ -194,8 +230,46 @@ public class PlcmAlgo extends Operator {
 				System.exit(1);
 			}
 		} else
-			collector = new RPCollector();
+			collector = new RMCollector();
 		// collector = new StdOutCollector();
 		return collector;
+	}
+
+	public void createAttributes(ArrayList<int[]> transactionsList) {
+
+		int lengthOflongestTransaction = 0;
+		for (int i = 0; i < transactionsList.size(); i++) {
+			if (transactionsList.get(i).length > lengthOflongestTransaction) {
+				lengthOflongestTransaction = transactionsList.get(i).length;
+			}
+		}
+		attributes = new Attribute[lengthOflongestTransaction - 1];
+		attributes[0] = AttributeFactory.createAttribute("Support",
+				Ontology.INTEGER);
+		for (int i = 1; i < attributes.length; i++) {
+			attributes[i] = AttributeFactory.createAttribute("item_" + i,
+					Ontology.INTEGER);
+		}
+	}
+
+	public void createExampleTable(Attribute[] attributes, OutputPort output) {
+		stdTransactionline = new Integer[attributes.length];
+		Arrays.fill(stdTransactionline, null);
+
+		MemoryExampleTable table = new MemoryExampleTable(attributes);
+		DataRowFactory ROW_FACTORY = new DataRowFactory(0, ',');
+
+		for (int[] transaction : PLCM.getResList()) {
+			for (int i = 0; i < transaction.length - 1; i++) {
+				stdTransactionline[i] = transaction[i];
+			}
+			System.out.println(" ");
+			DataRow dataRow = ROW_FACTORY
+					.create(stdTransactionline, attributes);
+			table.addDataRow(dataRow);
+			Arrays.fill(stdTransactionline, null);
+		}
+		ExampleSet resultExampleSet = table.createExampleSet();
+		output.deliver(resultExampleSet);
 	}
 }

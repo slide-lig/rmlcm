@@ -21,7 +21,10 @@
 
 package com.rapidminer.lcm.io;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+
+import com.rapidminer.lcm.obj.SupportPatternObject;
 
 /**
  * a PatternsCollector decorator : it will sort items in transactions before
@@ -30,6 +33,7 @@ import java.util.Arrays;
 public class PatternSortCollector implements PatternsCollector {
 
 	protected final PatternsCollector decorated;
+	private ArrayList<int []> res = new ArrayList<int []>();
 
 	public PatternSortCollector(PatternsCollector wrapped) {
 		this.decorated = wrapped;
@@ -38,6 +42,7 @@ public class PatternSortCollector implements PatternsCollector {
 	public void collect(final int support, final int[] pattern) {
 		int[] sorted = Arrays.copyOf(pattern, pattern.length);
 		Arrays.sort(sorted);
+		
 		this.decorated.collect(support, sorted);
 	}
 
@@ -47,6 +52,12 @@ public class PatternSortCollector implements PatternsCollector {
 
 	public int getAveragePatternLength() {
 		return this.decorated.getAveragePatternLength();
+	}
+
+	@Override
+	public ArrayList<int[]> getRes() {
+		new UnsupportedOperationException();
+		return null;
 	}
 
 }

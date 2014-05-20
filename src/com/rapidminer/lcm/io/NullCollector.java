@@ -16,13 +16,16 @@
 	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 	See the License for the specific language governing permissions and
 	limitations under the License.
-*/
-
+ */
 
 package com.rapidminer.lcm.io;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
+
+import com.rapidminer.lcm.obj.SupportPatternObject;
 
 /**
  * The collector that doesn't care at all about outputting
@@ -31,9 +34,18 @@ public class NullCollector implements PatternsCollector {
 
 	protected AtomicInteger collectedCount = new AtomicInteger(0);
 	protected AtomicLong collectedLength = new AtomicLong(0);
+	private int[] table;
+	private ArrayList<int[]> res = new ArrayList<int[]>();
+
+	// private SupportPatternObject spobj;
+	// private ArrayList<SupportPatternObject> res = new
+	// ArrayList<SupportPatternObject>();
 
 	@Override
 	public void collect(int support, int[] pattern) {
+
+		table = this.createTransactionLine(support, pattern);
+		res.add(table);
 		this.collectedCount.incrementAndGet();
 		this.collectedLength.addAndGet(pattern.length);
 	}
@@ -47,7 +59,22 @@ public class NullCollector implements PatternsCollector {
 		if (this.collectedCount.get() == 0) {
 			return 0;
 		} else {
-			return (int) (this.collectedLength.get() / this.collectedCount.get());
+			return (int) (this.collectedLength.get() / this.collectedCount
+					.get());
 		}
+	}
+
+	@Override
+	public ArrayList<int[]> getRes() {
+		return res;
+	}
+
+	public int[] createTransactionLine(int support, int[] pattern) {
+		int[] table = new int[pattern.length + 2];
+		table[0] = support;
+		for (int i = 1; i < table.length - 1; i++) {
+			table[i] = pattern[i - 1];
+		}
+		return table;
 	}
 }

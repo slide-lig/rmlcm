@@ -22,6 +22,7 @@ package com.rapidminer.lcm;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,7 +47,6 @@ import com.rapidminer.lcm.io.MultiThreadedFileCollector;
 import com.rapidminer.lcm.io.NullCollector;
 import com.rapidminer.lcm.io.PatternSortCollector;
 import com.rapidminer.lcm.io.PatternsCollector;
-import com.rapidminer.lcm.io.RPCollector;
 import com.rapidminer.lcm.io.StdOutCollector;
 import com.rapidminer.lcm.obj.ExecuteInformationsIOObject;
 import com.rapidminer.lcm.obj.SupportPatternObject;
@@ -60,6 +60,14 @@ import com.rapidminer.tools.Ontology;
  * "An Efficient Algorithm for Enumerating Closed Patterns in Transaction Databases"
  * by Takeaki Uno el. al.
  */
+/**
+ * @author John624
+ *
+ */
+/**
+ * @author John624
+ *
+ */
 public class PLCM {
 	final List<PLCMThread> threads;
 	private ProgressWatcherThread progressWatch;
@@ -69,7 +77,10 @@ public class PLCM {
 
 	private final long[] globalCounters;
 
-	public static ConcurrentHashMap<Integer, String> RMres = new ConcurrentHashMap<Integer, String>();;
+	// public static ConcurrentHashMap<Integer, String> RMres = new
+	// ConcurrentHashMap<Integer, String>();
+
+	private static ArrayList<int[]> restab = new ArrayList<int[]>();
 
 	// private static boolean startMemoryWatch;
 
@@ -405,7 +416,9 @@ public class PLCM {
 
 		// RPCollector rp = (RPCollector) miner.collector;
 		// rp.showResultView(output);
-		resConsole(miner, output);
+		// resConsole(miner, output);
+		// Arrays.fill(restab, null);
+		restab = miner.collector.getRes();
 	}
 
 	public static void resSubConsole(Integer nbThreads, String info,
@@ -416,46 +429,81 @@ public class PLCM {
 				nbThreads, info, verboseConsoles);
 
 		consoleOutput.deliver(executeInfo);
-		// collectExecuteInformations(null, null);
 	}
 
+
+	/**
+	 * can be deleted
+	 * 
+	 * @param miner
+	 * @param output
+	 */
 	public static void resConsole(PLCM miner, OutputPort output) {
 
-		if (miner.collector instanceof RPCollector) {
-			PatternsCollector rpc;
-			rpc = (RPCollector) miner.collector;
-		}
-		
-		Attribute[] newAttributes = new Attribute[2];
+		// Attribute[] newAttributes = new Attribute[2];
+		Attribute[] attributes = new Attribute[miner.collector.getRes().size()];
 
-		newAttributes[0] = AttributeFactory.createAttribute("support",
+		attributes[0] = AttributeFactory.createAttribute("support",
 				Ontology.INTEGER);
-		newAttributes[1] = AttributeFactory.createAttribute("Pattern",
-				Ontology.STRING);
 
-		MemoryExampleTable table = new MemoryExampleTable(newAttributes);
-
-		DataRowFactory ROW_FACTORY = new DataRowFactory(0, '.');
-		// DataRowFactory row = new DataRowFactory(type, decimalPointCharacter)
-
-		String[] patterns = new String[2];
-		for (SupportPatternObject knowing : ((RPCollector) miner.collector).getRes()) {
-			// for (Entry<Integer, String> knowing : RMres.entrySet()) {
-			patterns[0] = knowing.getSupport().toString();
-			patterns[1] = knowing.getPattern();
-			DataRow row = ROW_FACTORY.create(patterns, newAttributes);
-			table.addDataRow(row);
+		for (int i = 1; i < attributes.length; i++) {
 		}
 
-		ExampleSet resultExampleSet = table.createExampleSet();
+		// newAttributes[0] = AttributeFactory.createAttribute("support",
+		// Ontology.INTEGER);
+		// newAttributes[1] = AttributeFactory.createAttribute("Pattern",
+		// Ontology.STRING);
 
-		output.deliver(resultExampleSet);
+		// MemoryExampleTable table = new MemoryExampleTable(newAttributes);
+
+		// DataRowFactory ROW_FACTORY = new DataRowFactory(0, '.');
+		// DataRowFactory row = new DataRowFactory(type, decimalPointCharacter)
+		// String[] patterns = new String[2];
+		//
+		// for (SupportPatternObject knowing : miner.collector.getRes()) {
+		// patterns[0] = knowing.getSupport().toString();
+		// patterns[1] = knowing.getPattern();
+		// DataRow row = ROW_FACTORY.create(patterns, newAttributes);
+		// table.addDataRow(row);
+		// }
+		//
+		// ExampleSet resultExampleSet = table.createExampleSet();
+		//
+		// output.deliver(resultExampleSet);
 		// return rpc.getRMResult();
 	}
+
+	// public ReturnCollector comparePatternCollector(
+	// PatternsCollector patternsCollector) {
+	// ReturnCollector returnCollector;
+	// if (patternsCollector instanceof RMCollector) {
+	// // PatternsCollector newPatternsCollector;
+	// // newPatternsCollector = (RMCollector) patternsCollector;
+	// returnCollector = new ReturnCollector(
+	// (RMCollector) patternsCollector);
+	// } else if (patternsCollector instanceof MultiThreadedFileCollector) {
+	// returnCollector = new ReturnCollector(
+	// (MultiThreadedFileCollector) patternsCollector);
+	// } else if (patternsCollector instanceof NullCollector) {
+	// returnCollector = new ReturnCollector(
+	// (NullCollector) patternsCollector);
+	// } else if (patternsCollector instanceof FileCollector) {
+	// returnCollector = new ReturnCollector(
+	// (FileCollector) patternsCollector);
+	// } else {
+	// returnCollector = new ReturnCollector(
+	// (StdOutCollector) patternsCollector);
+	// }
+	// return returnCollector;
+	// }
 
 	public static ExecuteInformationsIOObject collectExecuteInformations(
 			Integer nbThreads, String info, ArrayList<String> verboseConsoles) {
 		return new ExecuteInformationsIOObject(nbThreads, info, verboseConsoles);
+	}
+
+	public static ArrayList<int[]> getResList() {
+		return restab;
 	}
 
 	/**

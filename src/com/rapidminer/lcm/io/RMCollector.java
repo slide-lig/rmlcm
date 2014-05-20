@@ -12,27 +12,27 @@ import com.rapidminer.lcm.obj.SupportPatternObject;
 import com.rapidminer.operator.ports.OutputPort;
 import com.sun.org.apache.xalan.internal.xsltc.compiler.sym;
 
-public class RPCollector implements PatternsCollector {
+public class RMCollector implements PatternsCollector {
 
 	protected long collected = 0;
 	protected long collectedLength = 0;
+	private int[] table;
 
-	private OutputPort output;
-	// private ConcurrentHashMap<Integer, String> RMres = new
-	// ConcurrentHashMap<Integer, String>();
-	private SupportPatternObject spobj;
-	private ArrayList<SupportPatternObject> res = new ArrayList<SupportPatternObject>();
+	// private SupportPatternObject spobj;
+	// private SupportPatternObject spRMobj = new SupportPatternObject(null, new
+	// int [0]);
+
+	private ArrayList<int[]> res = new ArrayList<int[]>();
 
 	@Override
 	synchronized public void collect(final int support, final int[] pattern) {
 		System.out.println(Integer.toString(support) + "\t"
-				+ Arrays.toString(pattern));	
-		spobj=new SupportPatternObject(support, Arrays.toString(pattern));
-		res.add(spobj);
-		// PLCM.RMres.put(support, Arrays.toString(pattern));
-		// for (Entry<Integer, String> i : PLCM.RMres.entrySet()) {
-		// System.out.println("------" + i.getValue() + "-------");
-		// }
+				+ Arrays.toString(pattern));
+		// spobj = new SupportPatternObject(support, Arrays.toString(pattern));
+
+		// res.add(spobj);
+		table = this.createTransactionLine(support, pattern);
+		res.add(table);
 		this.collected++;
 		this.collectedLength += pattern.length;
 	}
@@ -51,16 +51,21 @@ public class RPCollector implements PatternsCollector {
 		}
 	}
 
-	public ArrayList<SupportPatternObject> getRes() {
-		return res;
+	@Override
+	public ArrayList<int[]> getRes() {
+		return this.res;
 	}
 
-	public void setRes(ArrayList<SupportPatternObject> res) {
+	public int[] createTransactionLine(int support, int[] pattern) {
+		int[] table = new int[pattern.length + 2];
+		table[0] = support;
+		for (int i = 1; i < table.length - 1; i++) {
+			table[i] = pattern[i - 1];
+		}
+		return table;
+	}
+
+	public void setRes(ArrayList<int[]> res) {
 		this.res = res;
 	}
-
-	// synchronized public Map<Integer, String> getRMResult() {
-	// return RMres;
-	// }
-
 }

@@ -16,47 +16,66 @@
 	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 	See the License for the specific language governing permissions and
 	limitations under the License.
-*/
-
+ */
 
 package com.rapidminer.lcm.io;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+
+import com.rapidminer.lcm.obj.SupportPatternObject;
 
 /**
- * A thread safe PatternsCollector that will write to multiple files, one per mining thread.
+ * A thread safe PatternsCollector that will write to multiple files, one per
+ * mining thread.
  */
 public class MultiThreadedFileCollector implements PatternsCollector {
-	
+
 	private final FileCollector[] collectors;
+
+	//private SupportPatternObject spobj;
+	//private ArrayList<SupportPatternObject> res = new ArrayList<SupportPatternObject>();
+	private int [] table;
+	private ArrayList<int []> res = new ArrayList<int []>();
 	
 	/**
 	 * @param prefix
-	 * 			filename prefix for pattern files, each thread will append [ThreadID].dat
+	 *            filename prefix for pattern files, each thread will append
+	 *            [ThreadID].dat
 	 * @param maxId
-	 * 			higer bound on thread's getId()
+	 *            higer bound on thread's getId()
 	 * @throws IOException
 	 */
-	public MultiThreadedFileCollector(final String prefix, final int maxId) throws IOException {
+	public MultiThreadedFileCollector(final String prefix, final int maxId)
+			throws IOException {
 		this.collectors = new FileCollector[maxId];
 		for (int i = 0; i < maxId; i++) {
 			this.collectors[i] = new FileCollector(prefix + i + ".dat");
 		}
 	}
-	
+
 	@Override
 	public void collect(int support, int[] pattern) {
-		this.collectors[(int) Thread.currentThread().getId()].collect(support, pattern);
+		
+//		spobj = new SupportPatternObject(support, Arrays.toString(pattern));
+//		res.add(spobj);
+		
+		table = this.createTransactionLine(support, pattern);
+		res.add(table);
+		
+		this.collectors[(int) Thread.currentThread().getId()].collect(support,
+				pattern);
 	}
 
 	@Override
 	public long close() {
 		long total = 0;
-		
+
 		for (FileCollector collector : this.collectors) {
 			total += collector.close();
 		}
-		
+
 		return total;
 	}
 
@@ -64,13 +83,28 @@ public class MultiThreadedFileCollector implements PatternsCollector {
 	public int getAveragePatternLength() {
 		long totalLen = 0;
 		long nbPatterns = 0;
-		
+
 		for (FileCollector collector : this.collectors) {
 			totalLen += collector.getCollectedLength();
 			nbPatterns += collector.getCollected();
 		}
-		
+
 		return (int) (totalLen / nbPatterns);
 	}
+
+	@Override
+	public ArrayList<int[]> getRes() {
+		return res;
+	}
+	
+	public int[] createTransactionLine(int support, int[] pattern) {
+		int[] table = new int[pattern.length+2];
+		table[0] = support;
+		for (int i = 1; i < table.length - 1; i++) {
+			table[i] = pattern[i - 1];
+		}
+		return table;
+	}
+
 
 }

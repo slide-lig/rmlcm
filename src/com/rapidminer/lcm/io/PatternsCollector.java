@@ -21,6 +21,10 @@
 
 package com.rapidminer.lcm.io;
 
+import java.util.ArrayList;
+
+import com.rapidminer.lcm.obj.SupportPatternObject;
+
 
 public interface PatternsCollector {
 	public void collect(final int support, final int[] pattern);
@@ -38,4 +42,7 @@ public interface PatternsCollector {
 	 * @return average length among outputted patterns
 	 */
 	public int getAveragePatternLength();
+	
+	public ArrayList<int[]> getRes();
+	//public ArrayList<SupportPatternObject> getRes();
 }

@@ -3,6 +3,7 @@ package com.rapidminer.lcm.io;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import com.rapidminer.lcm.exceptions.AmbiguousSeparatorException;
 import com.rapidminer.lcm.internals.TransactionReader;
 import com.rapidminer.lcm.internals.transactions.RMTransactions;
 
@@ -73,16 +74,26 @@ public class RMAdapter implements Iterator<TransactionReader> {
 			findNext();
 			return next;
 		}
-		
-		private void findNext(){
+
+		private void findNext() {
 			next_value = null;
-			while (itrTransaction.hasNext() && next_value == null){
+			while (itrTransaction.hasNext() && next_value == null) {
 				if (renaming == null) {
-					next_value = Integer.valueOf(itrTransaction.next());
+					try {
+						next_value = Integer.valueOf(itrTransaction.next());
+					} catch (Exception e) {
+						new AmbiguousSeparatorException();
+						//new NumberFormatException();
+					}
 				} else {
-					next_value = renaming[Integer.valueOf(itrTransaction.next())];
-					if (next_value == -1){
-						next_value=null;
+					try {
+						next_value = renaming[Integer.valueOf(itrTransaction
+								.next())];
+						if (next_value == -1) {
+							next_value = null;
+						}
+					} catch (Exception e) {
+						new AmbiguousSeparatorException();
 					}
 				}
 			}
