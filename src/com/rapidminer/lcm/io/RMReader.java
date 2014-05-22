@@ -33,7 +33,7 @@ import com.rapidminer.parameter.UndefinedParameterError;
 import com.rapidminer.parameter.conditions.BooleanParameterCondition;
 import com.rapidminer.tools.Ontology;
 
-public class RMReader extends Operator {
+public class RMReader extends Operator implements FIMIReader{
 
 	private static final String FILE_LOCATION = "file";
 
@@ -50,8 +50,6 @@ public class RMReader extends Operator {
 	private RMTransaction transaction;
 
 	private List<Integer> lengths;
-
-	// private ArrayList<E>
 
 	public RMReader(OperatorDescription description) {
 		super(description);

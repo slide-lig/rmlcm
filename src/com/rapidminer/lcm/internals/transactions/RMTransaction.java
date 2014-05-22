@@ -3,6 +3,7 @@ package com.rapidminer.lcm.internals.transactions;
 import java.util.ArrayList;
 
 import com.rapidminer.operator.ResultObjectAdapter;
+import com.rapidminer.operator.learner.associations.gsp.Transaction;
 
 public class RMTransaction extends ResultObjectAdapter {
 
@@ -23,6 +24,10 @@ public class RMTransaction extends ResultObjectAdapter {
 		}
 	}
 
+	public RMTransaction(ArrayList<String> list) {
+		this.transaction = list;
+	}
+
 	public boolean isInteger(String value) {
 		if (value == null || value.trim().equals("")) {
 			return false;
@@ -32,15 +37,28 @@ public class RMTransaction extends ResultObjectAdapter {
 		}
 	}
 
-	public int size(){
+	public int size() {
 		return transaction.size();
 	}
-	
+
 	public ArrayList<String> getTransaction() {
 		return transaction;
 	}
 
+	public RMTransaction remove(int index) {
+		transaction.remove(index);
+		return new RMTransaction(transaction);
+	}
+
 	public void setTransaction(ArrayList<String> transaction) {
 		this.transaction = transaction;
+	}
+
+	public void add(String string) {
+		transaction.add(string);
+	}
+
+	public void clear() {
+		transaction.clear();
 	}
 }

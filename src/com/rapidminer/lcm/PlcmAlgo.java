@@ -263,7 +263,6 @@ public class PlcmAlgo extends Operator {
 			for (int i = 0; i < transaction.length - 1; i++) {
 				stdTransactionline[i] = transaction[i];
 			}
-			System.out.println(" ");
 			DataRow dataRow = ROW_FACTORY
 					.create(stdTransactionline, attributes);
 			table.addDataRow(dataRow);

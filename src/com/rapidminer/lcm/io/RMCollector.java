@@ -26,8 +26,8 @@ public class RMCollector implements PatternsCollector {
 
 	@Override
 	synchronized public void collect(final int support, final int[] pattern) {
-		System.out.println(Integer.toString(support) + "\t"
-				+ Arrays.toString(pattern));
+		// System.out.println(Integer.toString(support) + "\t"
+		// + Arrays.toString(pattern));
 		// spobj = new SupportPatternObject(support, Arrays.toString(pattern));
 
 		// res.add(spobj);
