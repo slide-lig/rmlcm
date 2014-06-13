@@ -24,8 +24,6 @@ package com.rapidminer.lcm.io;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import com.rapidminer.lcm.obj.SupportPatternObject;
-
 /**
  * a PatternsCollector decorator : it will sort items in transactions before
  * transmitting them to the enclosed PatternsCollector
@@ -55,7 +53,7 @@ public class PatternSortCollector implements PatternsCollector {
 	}
 
 	@Override
-	public ArrayList<int[]> getRes() {
+	public ArrayList<int[]> getResultList() {
 		new UnsupportedOperationException();
 		return null;
 	}

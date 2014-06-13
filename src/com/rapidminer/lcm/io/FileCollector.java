@@ -160,7 +160,7 @@ public class FileCollector implements PatternsCollector {
 	}
 
 	@Override
-	public ArrayList<int[]> getRes() {
+	public ArrayList<int[]> getResultList() {
 		return res;
 	}
 

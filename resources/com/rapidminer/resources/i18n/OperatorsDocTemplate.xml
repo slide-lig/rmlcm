@@ -1,26 +1,35 @@
 <?xml version="1.0" encoding="windows-1252" standalone="no"?>
 <operatorHelp lang="en_EN">
-    <!--  This is an example how to specify the description of operators and the translation of it's key identifier
-    to names. 
-
-   <operator>
-      <name>SingleTextInput</name>
-      <synopsis>Generates word vectors from a single text.</synopsis>
-      <help />
-   </operator>
-   <operator>
-      <name>TextObjectWriter</name>
-      <synopsis>Writes a textobject into a file.</synopsis>
-      <help>This operator writes a given textObject into a file. It might be specified if an existing file with the same name should be overwritten.</help>
-   </operator>
-
-    This is how group ids are translated:
-    
-   <group>
-      <key>text_processing</key>
-      <name>Text Processing</name>
-   </group>
-
-    -->
+	<!-- This is an example how to specify the description of operators and 
+		the translation of it's key identifier to names. <operator> <name>SingleTextInput</name> 
+		<synopsis>Generates word vectors from a single text.</synopsis> <help /> 
+		</operator> <operator> <name>TextObjectWriter</name> <synopsis>Writes a textobject 
+		into a file.</synopsis> <help>This operator writes a given textObject into 
+		a file. It might be specified if an existing file with the same name should 
+		be overwritten.</help> </operator> This is how group ids are translated: 
+		<group> <key>text_processing</key> <name>Text Processing</name> </group> -->
+	<operator>
+		<name>PLCM</name>
+		<synopsis>Linear time Closed itemset Miner</synopsis>
+		<help>This operator uses algorithm PLCM to process a pattern mining
+			data set. (Efficient parallel
+			implementation of LCM by Takeaki Uno et
+			al. for frequent itemset
+			mining, done by Benjamin Négrevergne. Check
+			the paper in HPCS'10).
+		</help>
+	</operator>
+	<operator>
+		<name>test</name>
+		<synopsis>test it</synopsis>
+		<help>This operator writes a given textObject into a file. It might be
+			specified if an existing file with the same name should be
+			overwritten.
+		</help>
+	</operator>
+	<group>
+		<key>LCM</key>
+		<name>LCM</name>
+	</group>
 
 </operatorHelp>

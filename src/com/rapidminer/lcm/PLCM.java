@@ -22,12 +22,10 @@ package com.rapidminer.lcm;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -35,12 +33,6 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 
-import com.rapidminer.example.Attribute;
-import com.rapidminer.example.ExampleSet;
-import com.rapidminer.example.table.AttributeFactory;
-import com.rapidminer.example.table.DataRow;
-import com.rapidminer.example.table.DataRowFactory;
-import com.rapidminer.example.table.MemoryExampleTable;
 import com.rapidminer.lcm.internals.ExplorationStep;
 import com.rapidminer.lcm.internals.transactions.RMTransactions;
 import com.rapidminer.lcm.io.MultiThreadedFileCollector;
@@ -49,11 +41,9 @@ import com.rapidminer.lcm.io.PatternSortCollector;
 import com.rapidminer.lcm.io.PatternsCollector;
 import com.rapidminer.lcm.io.StdOutCollector;
 import com.rapidminer.lcm.obj.ExecuteInformationsIOObject;
-import com.rapidminer.lcm.obj.SupportPatternObject;
 import com.rapidminer.lcm.util.MemoryPeakWatcherThread;
 import com.rapidminer.lcm.util.ProgressWatcherThread;
 import com.rapidminer.operator.ports.OutputPort;
-import com.rapidminer.tools.Ontology;
 
 /**
  * LCM implementation, based on UnoAUA04 :
@@ -407,7 +397,7 @@ public class PLCM {
 		}
 
 		// (RPCollector)collector
-		System.err.println(miner.toString(additionalCounters));
+		//System.err.println(miner.toString(additionalCounters));
 
 		// PatternsCollector pc=miner.collector;
 
@@ -418,9 +408,11 @@ public class PLCM {
 		// rp.showResultView(output);
 		// resConsole(miner, output);
 		// Arrays.fill(restab, null);
-		restab = miner.collector.getRes();
+		restab = miner.collector.getResultList();
 	}
 
+	
+	// Show the execution informations as a result perspective in GUI Rapidminer
 	public static void resSubConsole(Integer nbThreads, String info,
 			OutputPort consoleOutput) {
 		ArrayList<String> verboseConsoles = null;
@@ -431,47 +423,6 @@ public class PLCM {
 		consoleOutput.deliver(executeInfo);
 	}
 
-
-	/**
-	 * can be deleted
-	 * 
-	 * @param miner
-	 * @param output
-	 */
-	public static void resConsole(PLCM miner, OutputPort output) {
-
-		// Attribute[] newAttributes = new Attribute[2];
-		Attribute[] attributes = new Attribute[miner.collector.getRes().size()];
-
-		attributes[0] = AttributeFactory.createAttribute("support",
-				Ontology.INTEGER);
-
-		for (int i = 1; i < attributes.length; i++) {
-		}
-
-		// newAttributes[0] = AttributeFactory.createAttribute("support",
-		// Ontology.INTEGER);
-		// newAttributes[1] = AttributeFactory.createAttribute("Pattern",
-		// Ontology.STRING);
-
-		// MemoryExampleTable table = new MemoryExampleTable(newAttributes);
-
-		// DataRowFactory ROW_FACTORY = new DataRowFactory(0, '.');
-		// DataRowFactory row = new DataRowFactory(type, decimalPointCharacter)
-		// String[] patterns = new String[2];
-		//
-		// for (SupportPatternObject knowing : miner.collector.getRes()) {
-		// patterns[0] = knowing.getSupport().toString();
-		// patterns[1] = knowing.getPattern();
-		// DataRow row = ROW_FACTORY.create(patterns, newAttributes);
-		// table.addDataRow(row);
-		// }
-		//
-		// ExampleSet resultExampleSet = table.createExampleSet();
-		//
-		// output.deliver(resultExampleSet);
-		// return rpc.getRMResult();
-	}
 
 	// public ReturnCollector comparePatternCollector(
 	// PatternsCollector patternsCollector) {
@@ -495,8 +446,7 @@ public class PLCM {
 	// (StdOutCollector) patternsCollector);
 	// }
 	// return returnCollector;
-	// }
-
+	
 	public static ExecuteInformationsIOObject collectExecuteInformations(
 			Integer nbThreads, String info, ArrayList<String> verboseConsoles) {
 		return new ExecuteInformationsIOObject(nbThreads, info, verboseConsoles);

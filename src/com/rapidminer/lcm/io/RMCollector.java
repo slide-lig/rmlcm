@@ -2,16 +2,13 @@ package com.rapidminer.lcm.io;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.concurrent.ConcurrentHashMap;
 
-import com.rapidminer.lcm.PLCM;
-import com.rapidminer.lcm.obj.SupportPatternObject;
-import com.rapidminer.operator.ports.OutputPort;
-import com.sun.org.apache.xalan.internal.xsltc.compiler.sym;
-
+/**
+ * This class is offered for collecting result of PLCM calculate.
+ * 
+ * @author John624
+ * 
+ */
 public class RMCollector implements PatternsCollector {
 
 	protected long collected = 0;
@@ -29,10 +26,9 @@ public class RMCollector implements PatternsCollector {
 		// System.out.println(Integer.toString(support) + "\t"
 		// + Arrays.toString(pattern));
 		// spobj = new SupportPatternObject(support, Arrays.toString(pattern));
-
 		// res.add(spobj);
 		table = this.createTransactionLine(support, pattern);
-		res.add(table);
+			res.add(table);
 		this.collected++;
 		this.collectedLength += pattern.length;
 	}
@@ -52,11 +48,19 @@ public class RMCollector implements PatternsCollector {
 	}
 
 	@Override
-	public ArrayList<int[]> getRes() {
+	public ArrayList<int[]> getResultList() {
 		return this.res;
 	}
 
-	public int[] createTransactionLine(int support, int[] pattern) {
+	/**
+	 * Link the support and the pattern corresponding array to a new array
+	 * 
+	 * @param support
+	 * @param pattern
+	 * @return
+	 */
+	public int[] createTransactionLine(final int support, final int[] pattern) {
+		// System.out.println("test support is "+support);
 		int[] table = new int[pattern.length + 2];
 		table[0] = support;
 		for (int i = 1; i < table.length - 1; i++) {

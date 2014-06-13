@@ -3,9 +3,13 @@ package com.rapidminer.lcm.obj;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-
 import com.rapidminer.operator.ResultObjectAdapter;
 
+/**
+ * This class if for present the execution informations of PLCM in Rapidminer as a result perspective
+ * @author John624
+ *
+ */
 public class ExecuteInformationsIOObject extends ResultObjectAdapter {
 
 	/**

@@ -111,7 +111,6 @@ public final class ExplorationStep implements Cloneable {
 		this.pattern = this.counters.closure;
 		
 		reader.reset();
-		//System.out.println("hhhhhhhhhhhhhhhhh");
 		this.dataset = new Dataset(this.counters, reader);
 
 		this.candidates = this.counters.getExtensionsIterator();

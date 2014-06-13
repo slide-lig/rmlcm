@@ -1,16 +1,16 @@
 package com.rapidminer.lcm.obj;
 
-public class SupportPatternObject {
+public class SupportPatternIOObject {
 	private Integer support;
 	private String pattern;
 	private int [] intPattern;
 
-	public SupportPatternObject(Integer support, String pattern) {
+	public SupportPatternIOObject(Integer support, String pattern) {
 		this.support = support;
 		this.pattern = pattern;
 	}
 	
-	public SupportPatternObject(Integer support, int [] intPattern){
+	public SupportPatternIOObject(Integer support, int [] intPattern){
 		this.support = support;
 		this.intPattern = intPattern;
 	}

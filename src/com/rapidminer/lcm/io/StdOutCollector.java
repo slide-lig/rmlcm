@@ -23,8 +23,6 @@ package com.rapidminer.lcm.io;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import com.rapidminer.lcm.obj.SupportPatternObject;
-
 public class StdOutCollector implements PatternsCollector {
 
 	protected long collected = 0;
@@ -69,7 +67,7 @@ public class StdOutCollector implements PatternsCollector {
 	}
 
 	@Override
-	public ArrayList<int[]> getRes() {
+	public ArrayList<int[]> getResultList() {
 		return res;
 	}
 

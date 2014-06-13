@@ -1,6 +1,18 @@
 <ioobjects>
+<ioobject
+		name="identifyHashMap"
+		class="com.rapidminer.lcm.obj.IdentifyHashMapIOObject"
+		reportable="true">
+	  <renderer>com.rapidminer.lcm.renderer.IdentifyHashMapRenderer</renderer>
+	</ioobject>
+	
+<!--  	<ioobject
+		name="resultList"
+		class="com.rapidminer.lcm.obj.ResultListIOObject"
+		reportable="true">
+	  <renderer>com.rapidminer.lcm.renderer.ResultListRenderer</renderer>
+	</ioobject>
 
-<!--  
     This is an example how to specify IOObjects and theirs various renderers.
 	<ioobject
 		name="Document"

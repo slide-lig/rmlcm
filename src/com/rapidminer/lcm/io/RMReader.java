@@ -7,9 +7,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import com.rapidminer.example.Attribute;
@@ -33,7 +31,18 @@ import com.rapidminer.parameter.UndefinedParameterError;
 import com.rapidminer.parameter.conditions.BooleanParameterCondition;
 import com.rapidminer.tools.Ontology;
 
-public class RMReader extends Operator implements FIMIReader{
+/**
+ * 
+ * This class for reading a general format file of "transactions file" like:
+ * 
+ * "41 59 60 61"
+ * 
+ * "3 55"
+ * 
+ * @author John624
+ * 
+ */
+public class RMReader extends Operator implements FIMIReader {
 
 	private static final String FILE_LOCATION = "file";
 
@@ -49,16 +58,18 @@ public class RMReader extends Operator implements FIMIReader{
 	private RMTransactions transactions;
 	private RMTransaction transaction;
 
-	private List<Integer> lengths;
+	// private List<Integer> lengths;
+	private int sizeofLongestTransaction = 0;
 
 	public RMReader(OperatorDescription description) {
 		super(description);
 	}
 
+	@Override
 	public void readFile() {
 		// transactions = new ArrayList<RMTransaction>();
 		// String fileLocation = null;
-		lengths = new ArrayList<Integer>();
+		// lengths = new ArrayList<Integer>();
 		// try {
 		// File newfile = this.getParameterAsFile(FILE_LOCATION);
 		// System.out.println(fileLocation + " file location");
@@ -113,15 +124,45 @@ public class RMReader extends Operator implements FIMIReader{
 					}
 					String[] newline = this.splitTransaction(line, lineRegex);
 					// String[] newline = line.split("\\s");
-					transaction = new RMTransaction(newline);
-					lengths.add(transaction.size());
+					int[] intline = new int[newline.length];
+
+					for (int i = 0; i < intline.length; i++) {
+						try {
+							intline[i] = Integer.valueOf(newline[i]);
+						} catch (Exception e) {
+							new NumberFormatException();
+						}
+					}
+
+					transaction = new RMTransaction(intline);
+
+					if (transaction.size() > sizeofLongestTransaction) {
+						sizeofLongestTransaction = transaction.size();
+					}
+					// lengths.add(transaction.size());
 					transactions.add(transaction);
 				}
 			} else {
 				while ((line = input.readLine()) != null) {
 					String[] newline = line.split("\\s");
-					transaction = new RMTransaction(newline);
-					lengths.add(transaction.size());
+					
+					int[] intline = new int[newline.length];
+
+					for (int i = 0; i < intline.length; i++) {
+						try {
+							intline[i] = Integer.valueOf(newline[i]);
+						} catch (Exception e) {
+							new NumberFormatException();
+						}
+					}
+					
+					transaction = new RMTransaction(intline);
+					// lengths.add(transaction.size()-1);
+
+					if (transaction.size() > sizeofLongestTransaction) {
+						sizeofLongestTransaction = transaction.size();
+					}
+
 					transactions.add(transaction);
 				}
 			}
@@ -143,15 +184,13 @@ public class RMReader extends Operator implements FIMIReader{
 		proutput.deliver(this.transactions);
 	}
 
-	/**
-	 * @param transactions
-	 */
+	@Override
 	public ExampleSet showOriginalData(RMTransactions transactions) {
 		// List<Attribute> attributes = new LinkedList<Attribute>();
 		Attribute[] attributes = new Attribute[this
-				.getLengthOfLongestTransaction(transactions)];
+				.getLengthOfLongestTransaction()];
 
-		for (int i = 0; i < this.getLengthOfLongestTransaction(transactions); i++) {
+		for (int i = 0; i < this.getLengthOfLongestTransaction(); i++) {
 			attributes[i] = AttributeFactory.createAttribute("att" + i,
 					Ontology.INTEGER);
 			// attributes.add(AttributeFactory.createAttribute("att" + i,
@@ -167,8 +206,10 @@ public class RMReader extends Operator implements FIMIReader{
 			Integer[] data = new Integer[attributes.length];
 			Arrays.fill(data, null);
 			for (int j = 0; j < transactions.getTransactions().get(i).size(); j++) {
-				data[j] = Integer.valueOf(transactions.getTransactions().get(i)
-						.get(j).trim());
+				// data[j] =
+				// Integer.valueOf(transactions.getTransactions().get(i)
+				// .get(j).trim());
+				data[j] = transactions.getTransactions().get(i).get(j);
 			}
 			DataRow dataRow = ROW_FACTORY.create(data, attributes);
 			table.addDataRow(dataRow);
@@ -178,18 +219,37 @@ public class RMReader extends Operator implements FIMIReader{
 		return resultExampleSet;
 	}
 
-	public int getLengthOfLongestTransaction(RMTransactions transactions) {
-		Collections.sort(this.lengths);
-		if(lengths.size()==0){
-			return 1;
-		}
-		return lengths.get(lengths.size() - 1);
+	@Override
+	public int getLengthOfLongestTransaction() {
+		return sizeofLongestTransaction;
 	}
 
+	/**
+	 * split the line in file by "regex" to a transaction array
+	 * 
+	 * @param dataLine
+	 * @param regex
+	 * @return
+	 */
 	public String[] splitTransaction(String dataLine, String regex) {
 		String transactionLine[];
 		transactionLine = dataLine.split(regex);
 		return transactionLine;
+	}
+
+	/**
+	 * verify a item in transaction is "Integer" or not
+	 * 
+	 * @param value
+	 * @return
+	 */
+	public boolean isInteger(String value) {
+		if (value == null || value.trim().equals("")) {
+			return false;
+		} else {
+			boolean isInt = value.trim().matches("^\\d+$");
+			return isInt;
+		}
 	}
 
 	@Override

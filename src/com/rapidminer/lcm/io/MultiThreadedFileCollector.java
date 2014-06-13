@@ -22,9 +22,6 @@ package com.rapidminer.lcm.io;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
-
-import com.rapidminer.lcm.obj.SupportPatternObject;
 
 /**
  * A thread safe PatternsCollector that will write to multiple files, one per
@@ -93,7 +90,7 @@ public class MultiThreadedFileCollector implements PatternsCollector {
 	}
 
 	@Override
-	public ArrayList<int[]> getRes() {
+	public ArrayList<int[]> getResultList() {
 		return res;
 	}
 	

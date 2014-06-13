@@ -14,19 +14,39 @@
 				<replaces>plcm</replaces>
 			</operator>
 			<operator>
-				<key>lCMReader</key>
+				<key>FIMI Reader</key>
 				<class>com.rapidminer.lcm.io.RMReader</class>
 				<replaces>lcmreader</replaces>
 			</operator>
 			<operator>
-				<key>lCMExecuter</key>
+				<key>PLCM</key>
 				<class>com.rapidminer.lcm.PlcmAlgo</class>
 				<replaces>lcmexecuter</replaces>
 			</operator>
 			<operator>
-				<key>lCMMatcher</key>
-				<class>com.rapidminer.lcm.io.RMLCMMatcher</class>
-				<replaces>lcmmatcher</replaces>
+				<key>Identifier-item Reader</key>
+				<class>com.rapidminer.lcm.io.RMTIReader</class>
+				<replaces>lcmtireader</replaces>
+			</operator>
+			<operator>
+				<key>Items Composer</key>
+				<class>com.rapidminer.lcm.io.RMLCMComposer</class>
+				<replaces>itemscomposer</replaces>
+			</operator>
+			<operator>
+				<key>Read String FIMI Set</key>
+				<class>com.rapidminer.lcm.io.RMOriginalTransactionsSetReader</class>
+				<replaces>stringreader</replaces>
+			</operator>
+			<operator>
+				<key>Items Decomposer</key>
+				<class>com.rapidminer.lcm.io.RMDecomposer</class>
+				<replaces>decomposer</replaces>
+			</operator>
+			<operator>
+				<key>Items Composer test</key>
+				<class>com.rapidminer.lcm.io.RMComposer</class>
+				<replaces>composer</replaces>
 			</operator>
 		</group>
 	</group>

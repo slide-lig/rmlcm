@@ -3,7 +3,6 @@ package com.rapidminer.lcm;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 
 import com.rapidminer.example.Attribute;
@@ -16,10 +15,10 @@ import com.rapidminer.lcm.internals.transactions.RMTransactions;
 import com.rapidminer.lcm.io.MultiThreadedFileCollector;
 import com.rapidminer.lcm.io.PatternsCollector;
 import com.rapidminer.lcm.io.RMCollector;
+import com.rapidminer.lcm.obj.ResultListIOObject;
 import com.rapidminer.operator.Operator;
 import com.rapidminer.operator.OperatorDescription;
 import com.rapidminer.operator.OperatorException;
-import com.rapidminer.operator.nio.file.WriteFileOperator;
 import com.rapidminer.operator.ports.InputPort;
 import com.rapidminer.operator.ports.OutputPort;
 import com.rapidminer.parameter.ParameterType;
@@ -34,7 +33,14 @@ public class PlcmAlgo extends Operator {
 
 	// Attributes for port of rapidminer
 	private InputPort input = this.getInputPorts().createPort("in");
+	
+	//result of PLCM as Example Table
 	private OutputPort output = this.getOutputPorts().createPort("res");
+	
+	//result of PLCM as ResultListIOObject
+	private OutputPort transformerOutput = this.getOutputPorts().createPort("trs");
+	
+	//execution information
 	private OutputPort infoOutput = this.getOutputPorts().createPort("info");
 
 	// private static final String executionCommand = "key";
@@ -67,15 +73,15 @@ public class PlcmAlgo extends Operator {
 	@Override
 	public void doWork() throws OperatorException {
 
-		@SuppressWarnings("deprecation")
-		RMTransactions dataSet = input.getData();
+		//@SuppressWarnings("deprecation")
+		RMTransactions dataSet = input.getData(RMTransactions.class);
 		// RMTransactions transcaions = dataSetOriginal;
 		// loadedData.add(new Integer(1));
 
 		try {
 			// String[] arguments = new String[2];
 
-			String support = "1";
+			String support = "10";
 			String outputLocation = null;
 
 			// boolean showThread
@@ -118,6 +124,8 @@ public class PlcmAlgo extends Operator {
 			this.doLcm(support, outputLocation, dataSet, showThreadNb,
 					threadsNb, startMemoryWatch, verboseMode, ultraVerboseMode);
 
+			ResultListIOObject resultlist = new ResultListIOObject(PLCM.getResList(),Integer.valueOf(support));
+			transformerOutput.deliver(resultlist);
 			// this.endLcm();
 			// res.deliver(arguments);
 		} catch (UndefinedParameterError e) {
@@ -126,6 +134,8 @@ public class PlcmAlgo extends Operator {
 		}
 	}
 
+	// get parameters that user inputed in the area of Parameters in Rapidminer
+	// GUI
 	@Override
 	public List<ParameterType> getParameterTypes() {
 		List<ParameterType> types = super.getParameterTypes();
@@ -177,6 +187,8 @@ public class PlcmAlgo extends Operator {
 		return types;
 	}
 
+	// Go into the PCLM algorithm and show the result as a table in the
+	// Rapidminer
 	// public void doLcm(String[] args, RMTransactions dataSet,
 	public void doLcm(String support, String outputLocation,
 			RMTransactions dataSet, boolean showThreadNb, int threadsNb,
@@ -198,7 +210,7 @@ public class PlcmAlgo extends Operator {
 		outputPath = outputLocation;
 		nbThreads = threadsNb;
 
-		System.out.println(outputPath);
+		//System.out.println(outputPath);
 
 		PatternsCollector collector = initCollector(outputPath, nbThreads);
 		// PatternsCollector collector = initCollector(null, nbThreads);
@@ -217,6 +229,14 @@ public class PlcmAlgo extends Operator {
 		// PLCM.printMan(options);
 	}
 
+	/**
+	 * According to the "output path" and "number of Threads" which user used
+	 * for generating a result collector
+	 * 
+	 * @param outputPath
+	 * @param nbThreads
+	 * @return
+	 */
 	private static PatternsCollector initCollector(String outputPath,
 			int nbThreads) {
 		PatternsCollector collector = null;
@@ -235,8 +255,16 @@ public class PlcmAlgo extends Operator {
 		return collector;
 	}
 
+	/**
+	 * Create attributes for all items in data set, for example: transaction A:
+	 * 1 4 7 transaction B: 3 8
+	 * 
+	 * this method will create a item list with content like:
+	 * "item1 item2 item3"
+	 * 
+	 * @param transactionsList
+	 */
 	public void createAttributes(ArrayList<int[]> transactionsList) {
-
 		int lengthOflongestTransaction = 0;
 		for (int i = 0; i < transactionsList.size(); i++) {
 			if (transactionsList.get(i).length > lengthOflongestTransaction) {
@@ -247,11 +275,18 @@ public class PlcmAlgo extends Operator {
 		attributes[0] = AttributeFactory.createAttribute("Support",
 				Ontology.INTEGER);
 		for (int i = 1; i < attributes.length; i++) {
-			attributes[i] = AttributeFactory.createAttribute("item_" + i,
+			attributes[i] = AttributeFactory.createAttribute("item " + i,
 					Ontology.INTEGER);
 		}
 	}
 
+	/**
+	 * create result as a Example Table to deliver to the result perspective,
+	 * this method uses the array of attributes that generated before.
+	 * 
+	 * @param attributes
+	 * @param output
+	 */
 	public void createExampleTable(Attribute[] attributes, OutputPort output) {
 		stdTransactionline = new Integer[attributes.length];
 		Arrays.fill(stdTransactionline, null);
@@ -260,12 +295,20 @@ public class PlcmAlgo extends Operator {
 		DataRowFactory ROW_FACTORY = new DataRowFactory(0, ',');
 
 		for (int[] transaction : PLCM.getResList()) {
-			for (int i = 0; i < transaction.length - 1; i++) {
-				stdTransactionline[i] = transaction[i];
+			
+			try {
+				if (transaction[0] >= this.getParameterAsInt(threshold)) {
+					for (int i = 0; i < transaction.length - 1; i++) {
+						stdTransactionline[i] = transaction[i];
+					}
+					DataRow dataRow = ROW_FACTORY.create(stdTransactionline,
+							attributes);
+					table.addDataRow(dataRow);
+				}
+			} catch (UndefinedParameterError e) {
+				System.err.println("error when get 'threshold' ");
+				e.printStackTrace();
 			}
-			DataRow dataRow = ROW_FACTORY
-					.create(stdTransactionline, attributes);
-			table.addDataRow(dataRow);
 			Arrays.fill(stdTransactionline, null);
 		}
 		ExampleSet resultExampleSet = table.createExampleSet();
