@@ -16,6 +16,7 @@ import com.rapidminer.example.table.AttributeFactory;
 import com.rapidminer.example.table.DataRow;
 import com.rapidminer.example.table.DataRowFactory;
 import com.rapidminer.example.table.MemoryExampleTable;
+import com.rapidminer.lcm.exceptions.AmbiguousSeparatorException;
 import com.rapidminer.lcm.internals.transactions.RMTransaction;
 import com.rapidminer.lcm.internals.transactions.RMTransactions;
 import com.rapidminer.operator.Operator;
@@ -145,7 +146,7 @@ public class RMReader extends Operator implements FIMIReader {
 			} else {
 				while ((line = input.readLine()) != null) {
 					String[] newline = line.split("\\s");
-					
+
 					int[] intline = new int[newline.length];
 
 					for (int i = 0; i < intline.length; i++) {
@@ -155,7 +156,7 @@ public class RMReader extends Operator implements FIMIReader {
 							new NumberFormatException();
 						}
 					}
-					
+
 					transaction = new RMTransaction(intline);
 					// lengths.add(transaction.size()-1);
 
@@ -166,12 +167,12 @@ public class RMReader extends Operator implements FIMIReader {
 					transactions.add(transaction);
 				}
 			}
-
 			input.close();
 		} catch (IOException e) {
 			System.err.println("can't read this line!");
 			e.printStackTrace();
 		} catch (UndefinedParameterError e) {
+			new AmbiguousSeparatorException();
 			System.err.println("parameter undefined!");
 			e.printStackTrace();
 		}
@@ -180,6 +181,13 @@ public class RMReader extends Operator implements FIMIReader {
 	@Override
 	public void doWork() throws OperatorException {
 		this.readFile();
+
+		// for (TIntArrayList ts : transactions.getTransactions()) {
+		// for (int i = 0; i < ts.size(); i++) {
+		// System.out.print(" " + ts.get(i));
+		// }
+		// System.out.println("");
+		// }
 		stdoutput.deliver(this.showOriginalData(this.transactions));
 		proutput.deliver(this.transactions);
 	}

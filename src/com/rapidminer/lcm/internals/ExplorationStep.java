@@ -23,16 +23,14 @@ package com.rapidminer.lcm.internals;
 
 import gnu.trove.map.hash.TIntIntHashMap;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 
-import com.rapidminer.example.ExampleSet;
 import com.rapidminer.lcm.internals.Dataset.TransactionsIterable;
 import com.rapidminer.lcm.internals.Selector.WrongFirstParentException;
 import com.rapidminer.lcm.internals.transactions.RMTransactions;
 import com.rapidminer.lcm.io.RMAdapter;
-import com.rapidminer.lcm.io.RPFileReader;
+import com.rapidminer.lcm.io.RMAdapterRenamer;
 import com.rapidminer.lcm.util.ItemsetsFactory;
 
 /**
@@ -85,7 +83,6 @@ public final class ExplorationStep implements Cloneable {
 	 *            transaction containing space-separated item IDs.
 	 */
 	
-	//TODO
 	//Change public ExplorationStep(int minimumSupport, String path) -> ExplorationStep(int minimumSupport, ExampleSet exampleSet)
 	public ExplorationStep(int minimumSupport, RMTransactions dataSet) {
 		this.core_item = Integer.MAX_VALUE;
@@ -104,14 +101,11 @@ public final class ExplorationStep implements Cloneable {
 		RMAdapter reader = new RMAdapter(dataSet);
 		
 		this.counters = new Counters(minimumSupport, reader);
-		
-		//no longer needs reader.close(); because using the reader of exampleSet, dataSet saved already in the memory. 
-		reader.setRenaming(this.counters.renaming);
-
 		this.pattern = this.counters.closure;
+		reader.close();
 		
-		reader.reset();
-		this.dataset = new Dataset(this.counters, reader);
+		RMAdapterRenamer renamedReader = new RMAdapterRenamer(dataSet, this.counters.renaming);
+		this.dataset = new Dataset(this.counters, renamedReader);
 
 		this.candidates = this.counters.getExtensionsIterator();
 

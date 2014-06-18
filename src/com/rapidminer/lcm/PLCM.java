@@ -358,7 +358,7 @@ public class PLCM {
 		//
 
 		ExplorationStep initState = new ExplorationStep(minsup, dataSet);
-
+		//System.out.println(initState.dataset.toString());
 		long loadingTime = System.currentTimeMillis() - chrono;
 		System.err.println("Dataset loaded in " + loadingTime + "ms");
 

@@ -33,14 +33,15 @@ public class PlcmAlgo extends Operator {
 
 	// Attributes for port of rapidminer
 	private InputPort input = this.getInputPorts().createPort("in");
-	
-	//result of PLCM as Example Table
+
+	// result of PLCM as Example Table
 	private OutputPort output = this.getOutputPorts().createPort("res");
-	
-	//result of PLCM as ResultListIOObject
-	private OutputPort transformerOutput = this.getOutputPorts().createPort("trs");
-	
-	//execution information
+
+	// result of PLCM as ResultListIOObject
+	private OutputPort transformerOutput = this.getOutputPorts().createPort(
+			"trs");
+
+	// execution information
 	private OutputPort infoOutput = this.getOutputPorts().createPort("info");
 
 	// private static final String executionCommand = "key";
@@ -73,7 +74,7 @@ public class PlcmAlgo extends Operator {
 	@Override
 	public void doWork() throws OperatorException {
 
-		//@SuppressWarnings("deprecation")
+		// @SuppressWarnings("deprecation")
 		RMTransactions dataSet = input.getData(RMTransactions.class);
 		// RMTransactions transcaions = dataSetOriginal;
 		// loadedData.add(new Integer(1));
@@ -124,7 +125,8 @@ public class PlcmAlgo extends Operator {
 			this.doLcm(support, outputLocation, dataSet, showThreadNb,
 					threadsNb, startMemoryWatch, verboseMode, ultraVerboseMode);
 
-			ResultListIOObject resultlist = new ResultListIOObject(PLCM.getResList(),Integer.valueOf(support));
+			ResultListIOObject resultlist = new ResultListIOObject(
+					PLCM.getResList(), Integer.valueOf(support));
 			transformerOutput.deliver(resultlist);
 			// this.endLcm();
 			// res.deliver(arguments);
@@ -210,7 +212,7 @@ public class PlcmAlgo extends Operator {
 		outputPath = outputLocation;
 		nbThreads = threadsNb;
 
-		//System.out.println(outputPath);
+		// System.out.println(outputPath);
 
 		PatternsCollector collector = initCollector(outputPath, nbThreads);
 		// PatternsCollector collector = initCollector(null, nbThreads);
@@ -224,7 +226,10 @@ public class PlcmAlgo extends Operator {
 				ultraVerboseMode);
 
 		createAttributes(PLCM.getResList());
-		createExampleTable(attributes, output);
+
+		if (output.isConnected()) {
+			createExampleTable(attributes, output);
+		}
 		// PLCM.getResConsole(miner);
 		// PLCM.printMan(options);
 	}
@@ -295,23 +300,19 @@ public class PlcmAlgo extends Operator {
 		DataRowFactory ROW_FACTORY = new DataRowFactory(0, ',');
 
 		for (int[] transaction : PLCM.getResList()) {
-			
-			try {
-				if (transaction[0] >= this.getParameterAsInt(threshold)) {
-					for (int i = 0; i < transaction.length - 1; i++) {
-						stdTransactionline[i] = transaction[i];
-					}
-					DataRow dataRow = ROW_FACTORY.create(stdTransactionline,
-							attributes);
-					table.addDataRow(dataRow);
+
+			//if (transaction[0] >= this.getParameterAsInt(threshold)) {
+				for (int i = 0; i < transaction.length - 1; i++) {
+					stdTransactionline[i] = transaction[i];
 				}
-			} catch (UndefinedParameterError e) {
-				System.err.println("error when get 'threshold' ");
-				e.printStackTrace();
-			}
+				DataRow dataRow = ROW_FACTORY.create(stdTransactionline,
+						attributes);
+				table.addDataRow(dataRow);
+			//}
 			Arrays.fill(stdTransactionline, null);
 		}
 		ExampleSet resultExampleSet = table.createExampleSet();
+
 		output.deliver(resultExampleSet);
 	}
 }
