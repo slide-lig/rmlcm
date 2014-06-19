@@ -1,6 +1,5 @@
 package com.rapidminer.lcm.io;
 
-import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.hash.THashMap;
 
 import java.io.BufferedInputStream;
@@ -12,10 +11,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map.Entry;
 
 import com.rapidminer.example.Attribute;
-import com.rapidminer.example.Example;
 import com.rapidminer.example.ExampleSet;
 import com.rapidminer.example.table.AttributeFactory;
 import com.rapidminer.example.table.DataRow;
@@ -35,7 +32,7 @@ import com.rapidminer.parameter.UndefinedParameterError;
 import com.rapidminer.parameter.conditions.BooleanParameterCondition;
 import com.rapidminer.tools.Ontology;
 
-public class RMLCMComposer extends Operator {
+public class RMReaderWithComposer extends Operator {
 
 	// private static final String createItemMatcher = ""
 	private OutputPort output = this.getOutputPorts().createPort("out");
@@ -49,7 +46,7 @@ public class RMLCMComposer extends Operator {
 	private boolean useregex = false;
 	private THashMap<Integer, String> map = new THashMap<Integer, String>();
 
-	public RMLCMComposer(OperatorDescription description) {
+	public RMReaderWithComposer(OperatorDescription description) {
 		super(description);
 	}
 

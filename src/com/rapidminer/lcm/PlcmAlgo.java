@@ -11,6 +11,7 @@ import com.rapidminer.example.table.AttributeFactory;
 import com.rapidminer.example.table.DataRow;
 import com.rapidminer.example.table.DataRowFactory;
 import com.rapidminer.example.table.MemoryExampleTable;
+import com.rapidminer.lcm.exceptions.NoMatchedPatternsException;
 import com.rapidminer.lcm.internals.transactions.RMTransactions;
 import com.rapidminer.lcm.io.MultiThreadedFileCollector;
 import com.rapidminer.lcm.io.PatternsCollector;
@@ -73,7 +74,7 @@ public class PlcmAlgo extends Operator {
 
 	@Override
 	public void doWork() throws OperatorException {
-
+		long lStartTime = System.currentTimeMillis();
 		// @SuppressWarnings("deprecation")
 		RMTransactions dataSet = input.getData(RMTransactions.class);
 		// RMTransactions transcaions = dataSetOriginal;
@@ -122,8 +123,13 @@ public class PlcmAlgo extends Operator {
 				}
 			}
 
-			this.doLcm(support, outputLocation, dataSet, showThreadNb,
-					threadsNb, startMemoryWatch, verboseMode, ultraVerboseMode);
+			try {
+				this.doLcm(support, outputLocation, dataSet, showThreadNb,
+						threadsNb, startMemoryWatch, verboseMode,
+						ultraVerboseMode);
+			} catch (NoMatchedPatternsException e) {
+				e.errorDialog();
+			}
 
 			ResultListIOObject resultlist = new ResultListIOObject(
 					PLCM.getResList(), Integer.valueOf(support));
@@ -134,6 +140,12 @@ public class PlcmAlgo extends Operator {
 			System.err.println("Get Parameter error");
 			e.printStackTrace();
 		}
+		
+		long lEndTime = System.currentTimeMillis();
+		
+		long difference = lEndTime - lStartTime;
+		 
+		System.out.println("doWork milliseconds: " + difference);
 	}
 
 	// get parameters that user inputed in the area of Parameters in Rapidminer
@@ -195,7 +207,7 @@ public class PlcmAlgo extends Operator {
 	public void doLcm(String support, String outputLocation,
 			RMTransactions dataSet, boolean showThreadNb, int threadsNb,
 			boolean startMemoryWatch, boolean verboseMode,
-			boolean ultraVerboseMode) {
+			boolean ultraVerboseMode) throws NoMatchedPatternsException {
 
 		int nbThreads = Runtime.getRuntime().availableProcessors();
 		// Options options = new Options();
@@ -225,11 +237,21 @@ public class PlcmAlgo extends Operator {
 				infoOutput, showThreadNb, startMemoryWatch, verboseMode,
 				ultraVerboseMode);
 
-		createAttributes(PLCM.getResList());
-
-		if (output.isConnected()) {
-			createExampleTable(attributes, output);
+		if (PLCM.getResList().size() < 1) {
+			throw new NoMatchedPatternsException("Too big support exception");
 		}
+
+		else {
+			long lStartTime = System.currentTimeMillis();
+			createAttributes(PLCM.getResList());
+			if (output.isConnected()) {
+				createExampleTable(attributes, output);
+			}
+			long lEndTime = System.currentTimeMillis();
+			long difference = lEndTime - lStartTime;
+			System.out.println("Elapsed milliseconds: " + difference);
+		}
+
 		// PLCM.getResConsole(miner);
 		// PLCM.printMan(options);
 	}
@@ -301,14 +323,14 @@ public class PlcmAlgo extends Operator {
 
 		for (int[] transaction : PLCM.getResList()) {
 
-			//if (transaction[0] >= this.getParameterAsInt(threshold)) {
-				for (int i = 0; i < transaction.length - 1; i++) {
-					stdTransactionline[i] = transaction[i];
-				}
-				DataRow dataRow = ROW_FACTORY.create(stdTransactionline,
-						attributes);
-				table.addDataRow(dataRow);
-			//}
+			// if (transaction[0] >= this.getParameterAsInt(threshold)) {
+			for (int i = 0; i < transaction.length - 1; i++) {
+				stdTransactionline[i] = transaction[i];
+			}
+			DataRow dataRow = ROW_FACTORY
+					.create(stdTransactionline, attributes);
+			table.addDataRow(dataRow);
+			// }
 			Arrays.fill(stdTransactionline, null);
 		}
 		ExampleSet resultExampleSet = table.createExampleSet();

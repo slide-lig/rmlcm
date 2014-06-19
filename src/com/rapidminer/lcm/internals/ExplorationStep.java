@@ -93,7 +93,7 @@ public final class ExplorationStep implements Cloneable {
 		 * */
 		//consoleStep= new ArrayList<String>();
 		
-		String console = null;
+		//String console = null;
 		
 		//FileReader reader = new FileReader(path);
 		

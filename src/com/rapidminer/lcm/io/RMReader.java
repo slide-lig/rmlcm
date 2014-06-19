@@ -172,7 +172,6 @@ public class RMReader extends Operator implements FIMIReader {
 			System.err.println("can't read this line!");
 			e.printStackTrace();
 		} catch (UndefinedParameterError e) {
-			new AmbiguousSeparatorException();
 			System.err.println("parameter undefined!");
 			e.printStackTrace();
 		}
@@ -180,6 +179,7 @@ public class RMReader extends Operator implements FIMIReader {
 
 	@Override
 	public void doWork() throws OperatorException {
+		long lStartTime = System.currentTimeMillis();
 		this.readFile();
 
 		// for (TIntArrayList ts : transactions.getTransactions()) {
@@ -188,8 +188,15 @@ public class RMReader extends Operator implements FIMIReader {
 		// }
 		// System.out.println("");
 		// }
-		stdoutput.deliver(this.showOriginalData(this.transactions));
+		if (stdoutput.isConnected()) {
+			stdoutput.deliver(this.showOriginalData(this.transactions));
+		}
 		proutput.deliver(this.transactions);
+		long lEndTime = System.currentTimeMillis();
+
+		long difference = lEndTime - lStartTime;
+
+		System.out.println("read file in milliseconds: " + difference);
 	}
 
 	@Override

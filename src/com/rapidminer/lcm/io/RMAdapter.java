@@ -80,7 +80,12 @@ public class RMAdapter implements Iterator<TransactionReader> {
 		public void reset(TIntArrayList t) {
 			this.transaction = t;
 			itrTransaction = transaction.iterator();
-			findNext();
+			try {
+				findNext();
+			} catch (AmbiguousSeparatorException e) {
+				e.errorDialog();
+				e.printStackTrace();
+			}
 		}
 
 		@Override
@@ -91,29 +96,25 @@ public class RMAdapter implements Iterator<TransactionReader> {
 		@Override
 		public int next() {
 			int next = next_value;
-			findNext();
+			try {
+				findNext();
+			} catch (AmbiguousSeparatorException e) {
+				e.errorDialog();
+				e.printStackTrace();
+			}
 			return next;
 		}
 
-		private void findNext() {
+		private void findNext() throws AmbiguousSeparatorException {
 			next_value = null;
 			while (itrTransaction.hasNext() && next_value == null) {
 				if (renaming == null) {
-					try {
-						next_value = itrTransaction.next();
-					} catch (Exception e) {
-						new AmbiguousSeparatorException();
-						//new NumberFormatException();
-					}
+					next_value = itrTransaction.next();
 				} else {
-					try {
-						next_value = renaming[itrTransaction
-								.next()];
-						if (next_value == -1) {
-							next_value = null;
-						}
-					} catch (Exception e) {
-						new AmbiguousSeparatorException();
+					next_value = renaming[itrTransaction
+							.next()];
+					if (next_value == -1) {
+						next_value = null;
 					}
 				}
 			}

@@ -29,8 +29,8 @@
 				<replaces>lcmtireader</replaces>
 			</operator>
 			<operator>
-				<key>Items Composer</key>
-				<class>com.rapidminer.lcm.io.RMLCMComposer</class>
+				<key>Items Composer with Reading</key>
+				<class>com.rapidminer.lcm.io.RMReaderWithComposer</class>
 				<replaces>itemscomposer</replaces>
 			</operator>
 			<operator>
@@ -44,7 +44,7 @@
 				<replaces>decomposer</replaces>
 			</operator>
 			<operator>
-				<key>Items Composer test</key>
+				<key>Items Composer</key>
 				<class>com.rapidminer.lcm.io.RMComposer</class>
 				<replaces>composer</replaces>
 			</operator>

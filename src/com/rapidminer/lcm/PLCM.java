@@ -342,7 +342,6 @@ public class PLCM {
 		}
 
 		chrono = System.currentTimeMillis();
-		// TODO
 		/*
 		 * Change new ExplorationStep(minsup, args[0])-> new
 		 * ExplorationStep(minsup, exampleset) *
@@ -362,7 +361,7 @@ public class PLCM {
 		long loadingTime = System.currentTimeMillis() - chrono;
 		System.err.println("Dataset loaded in " + loadingTime + "ms");
 
-		// PatternsCollector collector = new RPCollector(); // TODO new
+		// PatternsCollector collector = new RPCollector(); new
 		// PatternsCollector for RapidMiner
 		// utiliser initState.counters.getReverseRenaming()
 
