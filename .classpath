@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/RapidMiner_Unuk"/>
+	<classpathentry kind="lib" path="lib/vldocking.jar"/>
+	<classpathentry kind="lib" path="C:/Users/John624/Documents/workspace/jLCM_rapidminer/lib/commons-cli-1.2.jar"/>
+	<classpathentry kind="lib" path="C:/Users/John624/Documents/workspace/jLCM_rapidminer/lib/junit-4.8.1.jar"/>
+	<classpathentry kind="lib" path="C:/Users/John624/Documents/workspace/jLCM_rapidminer/lib/trove4j-3.0.3.jar"/>
+	<classpathentry kind="output" path="build"/>
+</classpath>
