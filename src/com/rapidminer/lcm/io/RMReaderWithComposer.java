@@ -22,6 +22,7 @@ import com.rapidminer.lcm.obj.ResultListIOObject;
 import com.rapidminer.operator.Operator;
 import com.rapidminer.operator.OperatorDescription;
 import com.rapidminer.operator.OperatorException;
+import com.rapidminer.operator.UserError;
 import com.rapidminer.operator.ports.InputPort;
 import com.rapidminer.operator.ports.OutputPort;
 import com.rapidminer.parameter.ParameterType;
@@ -38,12 +39,13 @@ public class RMReaderWithComposer extends Operator {
 	private OutputPort output = this.getOutputPorts().createPort("out");
 	private InputPort input = this.getInputPorts().createPort("in");
 
-	private static final String FILE = "Identifier-File ";
+	private static final String FILE = "Identifier-File";
 
 	private static final String USE_REGEX = "Use special separator";
 	private static final String REGEX = "File-Separator ";
 
 	private boolean useregex = false;
+
 	private THashMap<Integer, String> map = new THashMap<Integer, String>();
 
 	public RMReaderWithComposer(OperatorDescription description) {
@@ -54,16 +56,23 @@ public class RMReaderWithComposer extends Operator {
 	public void doWork() throws OperatorException {
 		// RMTransactions data = input.getData(RMTransactions.class);
 		ResultListIOObject data = input.getData(ResultListIOObject.class);
-
-		useregex = this.getParameterAsBoolean(USE_REGEX);
-		File file = this.getParameterAsFile(FILE);
-		this.readIdentifierFile(file);
+		
+		
+		this.readIdentifierFile();
 		output.deliver(this.getMatchedTable(data, map));
 	}
 
-	public void readIdentifierFile(File file) {
+	public void readIdentifierFile() {
+	
+		
 		BufferedInputStream bufferInput = null;
+		
+		
+		
 		try {
+			File file = this.getParameterAsFile(FILE);
+			
+			useregex = this.getParameterAsBoolean(USE_REGEX);
 			bufferInput = new BufferedInputStream(new FileInputStream(file),
 					10 * 1024 * 1024);
 			BufferedReader input = new BufferedReader(new InputStreamReader(
@@ -98,6 +107,9 @@ public class RMReaderWithComposer extends Operator {
 			e.printStackTrace();
 		} catch (UndefinedParameterError e) {
 			System.err.println("Undefined Parameter Error!");
+			e.printStackTrace();
+		} catch (UserError e) {
+			System.err.println("User Error!");
 			e.printStackTrace();
 		}
 	}
@@ -194,8 +206,9 @@ public class RMReaderWithComposer extends Operator {
 				"Use special separator for this file", false, false));
 
 		regexMatcher.registerDependencyCondition(new BooleanParameterCondition(
-				this, REGEX, true, true));
+				this, USE_REGEX, true, true));
 
+		types.add(regexMatcher);
 		return types;
 	}
 }
