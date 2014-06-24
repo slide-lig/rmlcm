@@ -4,7 +4,7 @@
 	<group key="">
 		<group key="LCM">
 			<operator>
-				<key>test</key>
+	<!--		<key>test</key>
 				<class>com.rapidminer.TestOp</class>
 				<replaces>lcm</replaces>
 			</operator>
@@ -13,8 +13,8 @@
 				<class>com.rapidminer.lcm.Mainlcm</class>
 				<replaces>plcm</replaces>
 			</operator>
-			<operator>
-				<key>FIMI Reader</key>
+			<operator>  -->
+				<key>Read FIMI dataset</key>
 				<class>com.rapidminer.lcm.io.RMReader</class>
 				<replaces>lcmreader</replaces>
 			</operator>
@@ -24,7 +24,7 @@
 				<replaces>lcmexecuter</replaces>
 			</operator>
 			<operator>
-				<key>Identifier-item Reader</key>
+				<key>Read Identifier-item dataset</key>
 				<class>com.rapidminer.lcm.io.RMTIReader</class>
 				<replaces>lcmtireader</replaces>
 			</operator>
