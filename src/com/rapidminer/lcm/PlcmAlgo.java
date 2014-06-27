@@ -127,25 +127,28 @@ public class PlcmAlgo extends Operator {
 				this.doLcm(support, outputLocation, dataSet, showThreadNb,
 						threadsNb, startMemoryWatch, verboseMode,
 						ultraVerboseMode);
+
+				long lEndTime = System.currentTimeMillis();
+
+				long difference = lEndTime - lStartTime;
+
+				System.out.println("doWork milliseconds: " + difference);
 			} catch (NoMatchedPatternsException e) {
 				e.errorDialog();
 			}
-
-			ResultListIOObject resultlist = new ResultListIOObject(
-					PLCM.getResList(), Integer.valueOf(support));
-			transformerOutput.deliver(resultlist);
+			
+			if (transformerOutput.isConnected()) {
+				ResultListIOObject resultlist = new ResultListIOObject(
+						PLCM.getResList(), Integer.valueOf(support));
+				transformerOutput.deliver(resultlist);
+			}
 			// this.endLcm();
 			// res.deliver(arguments);
 		} catch (UndefinedParameterError e) {
 			System.err.println("Get Parameter error");
 			e.printStackTrace();
 		}
-		
-		long lEndTime = System.currentTimeMillis();
-		
-		long difference = lEndTime - lStartTime;
-		 
-		System.out.println("doWork milliseconds: " + difference);
+
 	}
 
 	// get parameters that user inputed in the area of Parameters in Rapidminer
@@ -335,6 +338,8 @@ public class PlcmAlgo extends Operator {
 		}
 		ExampleSet resultExampleSet = table.createExampleSet();
 
-		output.deliver(resultExampleSet);
+		if (output.isConnected()) {
+			output.deliver(resultExampleSet);
+		}
 	}
 }

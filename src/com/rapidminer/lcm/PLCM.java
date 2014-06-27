@@ -56,7 +56,7 @@ import com.rapidminer.operator.ports.OutputPort;
  */
 /**
  * @author John624
- *
+ * 
  */
 public class PLCM {
 	final List<PLCMThread> threads;
@@ -357,7 +357,7 @@ public class PLCM {
 		//
 
 		ExplorationStep initState = new ExplorationStep(minsup, dataSet);
-		//System.out.println(initState.dataset.toString());
+		// System.out.println(initState.dataset.toString());
 		long loadingTime = System.currentTimeMillis() - chrono;
 		System.err.println("Dataset loaded in " + loadingTime + "ms");
 
@@ -396,7 +396,7 @@ public class PLCM {
 		}
 
 		// (RPCollector)collector
-		//System.err.println(miner.toString(additionalCounters));
+		// System.err.println(miner.toString(additionalCounters));
 
 		// PatternsCollector pc=miner.collector;
 
@@ -410,42 +410,20 @@ public class PLCM {
 		restab = miner.collector.getResultList();
 	}
 
-	
 	// Show the execution informations as a result perspective in GUI Rapidminer
 	public static void resSubConsole(Integer nbThreads, String info,
 			OutputPort consoleOutput) {
 		ArrayList<String> verboseConsoles = null;
+		if (consoleOutput.isConnected()) {
+			ExecuteInformationsIOObject executeInfo = collectExecuteInformations(
+					nbThreads, info, verboseConsoles);
 
-		ExecuteInformationsIOObject executeInfo = collectExecuteInformations(
-				nbThreads, info, verboseConsoles);
-
-		consoleOutput.deliver(executeInfo);
+			consoleOutput.deliver(executeInfo);
+		} else {
+			return;
+		}
 	}
 
-
-	// public ReturnCollector comparePatternCollector(
-	// PatternsCollector patternsCollector) {
-	// ReturnCollector returnCollector;
-	// if (patternsCollector instanceof RMCollector) {
-	// // PatternsCollector newPatternsCollector;
-	// // newPatternsCollector = (RMCollector) patternsCollector;
-	// returnCollector = new ReturnCollector(
-	// (RMCollector) patternsCollector);
-	// } else if (patternsCollector instanceof MultiThreadedFileCollector) {
-	// returnCollector = new ReturnCollector(
-	// (MultiThreadedFileCollector) patternsCollector);
-	// } else if (patternsCollector instanceof NullCollector) {
-	// returnCollector = new ReturnCollector(
-	// (NullCollector) patternsCollector);
-	// } else if (patternsCollector instanceof FileCollector) {
-	// returnCollector = new ReturnCollector(
-	// (FileCollector) patternsCollector);
-	// } else {
-	// returnCollector = new ReturnCollector(
-	// (StdOutCollector) patternsCollector);
-	// }
-	// return returnCollector;
-	
 	public static ExecuteInformationsIOObject collectExecuteInformations(
 			Integer nbThreads, String info, ArrayList<String> verboseConsoles) {
 		return new ExecuteInformationsIOObject(nbThreads, info, verboseConsoles);
