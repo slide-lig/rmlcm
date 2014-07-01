@@ -48,6 +48,11 @@
 				<class>com.rapidminer.lcm.io.RMComposer</class>
 				<replaces>composer</replaces>
 			</operator>
+			<operator>
+				<key>Write Sqlite</key>
+				<class>com.rapidminer.lcm.io.RMSQLiteWriter</class>
+				<replaces>sqlitewriter</replaces>
+			</operator>
 		</group>
 	</group>
 </operators>
