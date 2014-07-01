@@ -110,13 +110,13 @@ public class RMSQLiteWriter extends Operator {
 					+ " (ID INTEGER PRIMARY KEY  NOT NULL, "
 					+ "SUPPORT INT NOT NULL, " + items.toString() + ");";
 
-			System.out.println("-- :" + sql);
+			//System.out.println("-- :" + sql);
 
 			stmt.executeUpdate(sql);
 			stmt.close();
 			c.close();
 
-			System.out.println(" create Table OK");
+			System.out.println("Create Table OK");
 		} catch (SQLException e) {
 			System.err.println("Create statement error!");
 			e.printStackTrace();
@@ -184,7 +184,7 @@ public class RMSQLiteWriter extends Operator {
 
 				Arrays.fill(values, null);
 				sbvalues.setLength(0);
-				System.out.println("++ " + sql);
+				//System.out.println("++ " + sql);
 				stmt.executeUpdate(sql);
 
 				id = id + 1;

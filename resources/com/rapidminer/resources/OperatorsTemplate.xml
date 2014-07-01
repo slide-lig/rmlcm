@@ -49,7 +49,7 @@
 				<replaces>composer</replaces>
 			</operator>
 			<operator>
-				<key>Write Sqlite</key>
+				<key>Write SQLite</key>
 				<class>com.rapidminer.lcm.io.RMSQLiteWriter</class>
 				<replaces>sqlitewriter</replaces>
 			</operator>
