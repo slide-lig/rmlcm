@@ -42,11 +42,17 @@ public class RMSQLiteWriter extends Operator {
 
 		String nameoftb = this.getParameter(tablename);
 
+		String nameoftbFP = nameoftb + "FP";
+
+		String nameoftbITEM = nameoftb + "ITEM";
+
 		tbsize = this.lenthofLongestPattern(result);
 
-		createTable(c, nameofdb, nameoftb, tbsize);
+		createTables(c, nameofdb, nameoftbFP, nameoftbITEM);
+		insertValues(c, nameofdb, nameoftbFP, nameoftbITEM, result);
+		// createTable(c, nameofdb, nameoftb, tbsize);
 
-		insert(c, nameofdb, nameoftb, result, tbsize);
+		// insert(c, nameofdb, nameoftb, result, tbsize);
 
 		// commitAndclose(c);
 
@@ -67,6 +73,102 @@ public class RMSQLiteWriter extends Operator {
 			e.printStackTrace();
 		}
 		System.out.println("Opened database successfully!");
+	}
+
+	public void createTables(Connection c, String nameofdb, String nameoftbfp,
+			String nameoftbitem) {
+
+		Statement stmt = null;
+
+		try {
+			c = DriverManager.getConnection("jdbc:sqlite:" + nameofdb + ".db");
+
+			stmt = c.createStatement();
+
+			String fbsql = "DROP TABLE IF EXISTS " + nameoftbfp + ";";
+
+			stmt.execute(fbsql);
+
+			String itemsql = "DROP TABLE IF EXISTS " + nameoftbitem + ";";
+
+			stmt.execute(itemsql);
+
+			String fptbsql = "CREATE TABLE IF NOT EXISTS "
+					+ nameoftbfp
+					+ " (FPTBID INTEGER PRIMARY KEY  NOT NULL, SUPPORT INT NOT NULL, PATTERN TEXT NOT NULL);";
+
+			stmt.execute(fptbsql);
+
+			String itemtbsql = "CREATE TABLE IF NOT EXISTS "
+					+ nameoftbitem
+					+ "(ITEMTBID INTEGER PRIMARY KEY, ITEM INT NOT NULL,ITEMFPID INT NOT NULL, FOREIGN KEY(ITEMFPID) REFERENCES "
+					+ nameoftbfp + "(FPTBID));";
+			
+			//System.out.println(itemtbsql);
+			
+			stmt.execute(itemtbsql);
+
+			stmt.close();
+			c.close();
+
+		} catch (SQLException e) {
+			System.err.println("jdbc get connection error !!!");
+			e.printStackTrace();
+		}
+	}
+
+	public void insertValues(Connection c, String nameofdb, String nameoftbfp,
+			String nameoftbitem, ResultListIOObject result) {
+
+		Statement stmt = null;
+		try {
+			c = DriverManager.getConnection("jdbc:sqlite:" + nameofdb + ".db");
+
+			c.setAutoCommit(false);
+
+			stmt = c.createStatement();
+
+			String sql = null;
+
+			int fpid = 1;
+
+			for (int[] row : result.getResultlist()) {
+
+				int support = row[0];
+				int[] pattern = Arrays.copyOfRange(row, 1, row.length - 1);
+
+				String patternString = Arrays.toString(pattern);
+
+				// System.out.println(support + " " + patternString);
+
+				sql = "INSERT INTO " + nameoftbfp
+						+ " (FPTBID,SUPPORT,PATTERN) VALUES (" + fpid + ","
+						+ support + ",('" + patternString + "'));";
+
+				// System.out.println(sql);
+
+				stmt.execute(sql);
+
+				// int itemid = 1;
+				for (int i : pattern) {
+					String innersql = "INSERT INTO " + nameoftbitem
+							+ " (ITEM,ITEMFPID) VALUES (" + i + "," + fpid
+							+ ");";
+					stmt.execute(innersql);
+				}
+
+				fpid++;
+			}
+
+			stmt.close();
+
+			c.commit();
+			c.close();
+
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	public void createTable(Connection c, String nameofdb, String nameoftb,
@@ -103,14 +205,14 @@ public class RMSQLiteWriter extends Operator {
 			// stmt.executeUpdate(dorp);
 			// }
 
-			String dorp = "DROP TABLE IF EXISTS " + nameoftb+ ";";
+			String dorp = "DROP TABLE IF EXISTS " + nameoftb + ";";
 			stmt.executeUpdate(dorp);
 
 			String sql = "CREATE TABLE IF NOT EXISTS " + nameoftb
 					+ " (ID INTEGER PRIMARY KEY  NOT NULL, "
 					+ "SUPPORT INT NOT NULL, " + items.toString() + ");";
 
-			//System.out.println("-- :" + sql);
+			// System.out.println("-- :" + sql);
 
 			stmt.executeUpdate(sql);
 			stmt.close();
@@ -184,7 +286,7 @@ public class RMSQLiteWriter extends Operator {
 
 				Arrays.fill(values, null);
 				sbvalues.setLength(0);
-				//System.out.println("++ " + sql);
+				// System.out.println("++ " + sql);
 				stmt.executeUpdate(sql);
 
 				id = id + 1;
