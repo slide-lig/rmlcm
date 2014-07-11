@@ -95,14 +95,14 @@ public class RMSQLiteWriter extends Operator {
 
 			String fptbsql = "CREATE TABLE IF NOT EXISTS "
 					+ nameoftbfp
-					+ " (FPTBID INTEGER PRIMARY KEY  NOT NULL, SUPPORT INT NOT NULL, PATTERN TEXT NOT NULL);";
+					+ " (PATTERNID INTEGER PRIMARY KEY  NOT NULL, SUPPORT INT NOT NULL, PATTERNDESCRIPTION TEXT NOT NULL);";
 
 			stmt.execute(fptbsql);
 
 			String itemtbsql = "CREATE TABLE IF NOT EXISTS "
 					+ nameoftbitem
-					+ "(ITEMTBID INTEGER PRIMARY KEY, ITEM INT NOT NULL,ITEMFPID INT NOT NULL, FOREIGN KEY(ITEMFPID) REFERENCES "
-					+ nameoftbfp + "(FPTBID));";
+					+ "(ITEM INT NOT NULL,PATTERNID INT NOT NULL, FOREIGN KEY(PATTERNID) REFERENCES "
+					+ nameoftbfp + "(PATTERNID));";
 			
 			//System.out.println(itemtbsql);
 			
@@ -142,7 +142,7 @@ public class RMSQLiteWriter extends Operator {
 				// System.out.println(support + " " + patternString);
 
 				sql = "INSERT INTO " + nameoftbfp
-						+ " (FPTBID,SUPPORT,PATTERN) VALUES (" + fpid + ","
+						+ " (PATTERNID,SUPPORT,PATTERNDESCRIPTION) VALUES (" + fpid + ","
 						+ support + ",('" + patternString + "'));";
 
 				// System.out.println(sql);
@@ -152,7 +152,7 @@ public class RMSQLiteWriter extends Operator {
 				// int itemid = 1;
 				for (int i : pattern) {
 					String innersql = "INSERT INTO " + nameoftbitem
-							+ " (ITEM,ITEMFPID) VALUES (" + i + "," + fpid
+							+ " (ITEM,PATTERNID) VALUES (" + i + "," + fpid
 							+ ");";
 					stmt.execute(innersql);
 				}

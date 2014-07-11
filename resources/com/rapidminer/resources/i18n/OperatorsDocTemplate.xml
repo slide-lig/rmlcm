@@ -19,6 +19,153 @@
 			the paper in HPCS'10).
 		</help>
 	</operator>
+
+	<operator>
+		<name>Read FIMI dataset</name>
+		<synopsis>This operator is for reading "Frequent Itemset Mining
+			Dataset"
+		</synopsis>
+		<help>
+			Frequent Itemset Mining Dataset:
+			eg:
+			2 3 9 14 23 26 34 36 39 40 52
+			55 59
+			63 67 76 85 86 90 93 99 108 114
+		</help>
+	</operator>
+
+
+	<operator>
+		<name>Read Identifier-item dataset</name>
+		<synopsis>This operator is for reading "Identifier-item dataset"
+		</synopsis>
+		<help>
+			Identifier-item dataset:
+			eg:
+			1 3
+			1 4
+			2 1537
+			2 647
+			3 11
+		</help>
+	</operator>
+
+	<operator>
+		<name>Read String FIMI Set</name>
+		<synopsis>This operator is for reading "String FIMI dataset"
+		</synopsis>
+		<help>
+			String FIMI dataset:
+			eg:
+			A B D
+			E
+			G P
+			R T
+		</help>
+	</operator>
+
+	<operator>
+		<name>Items Decomposer</name>
+		<synopsis>Translate a string dataset as a integer dataset for PLCM,
+			and
+			generate a a Meta map for each item and its identifier.
+		</synopsis>
+		<help>
+			String FIMI dataset:
+			A B D
+			E
+			G E
+			translate it as:
+			1 2 3
+			4
+			5 4
+		</help>
+	</operator>
+
+	<operator>
+		<name>Items Composer</name>
+		<synopsis>Translate the result of PCLM as a string readable result.
+		</synopsis>
+		<help>
+			FIMI dataset:
+			1 2 3
+			4
+			5 4
+			translate it as String patterns:
+			A B D
+			E
+			G E
+		</help>
+	</operator>
+
+	<operator>
+		<name>Items Composer with Reading</name>
+		<synopsis>Read a Meta information's file and combine the result of
+			PLCM (ResultListIOObject) to get a string readable result of PLCM.
+		</synopsis>
+		<help>
+			Mata file:
+			1 A
+			2 B
+			3 C
+			4 D
+			5 E
+			6 G
+			read mata file and translate it as
+			String patterns:
+			A B D
+			E
+			G E
+			as:
+			1 2 4
+			5
+			6 5
+		</help>
+	</operator>
+
+	<operator>
+		<name>Write SQLite</name>
+		<synopsis>Create a ".db" file for SQLite database, as for
+			ease of use.
+			This ".db" file will generate automatically in the root
+			installation path of your Rapidminer.
+		</synopsis>
+		<help>
+			Create a ".db" file for SQLite database (download), as for ease
+			of use. This ".db" file will generate automatically in the root
+			installation path of your Rapidminer. In this database, there will be
+			two tables for your result, one table named as your input table's
+			prefix + "FP", for example, if you name the prefix of table as
+			"test", the name of this first table will be "testFP", and this table
+			includes three columns:
+
+			(PATTERNID INTEGER PRIMARY KEY NOT NULL, SUPPORT INT NOT NULL,
+			PATTERNDESCRIPTION TEXT NOT NULL)
+
+			PATTERNID: id for each patterns
+
+			SUPPORT : support of pattern
+
+			PATTERNDESCRIPTION: content in this pattern
+
+			Then, there will be an other table generated, its name is user inputted
+			prefix + "ITEM". For example, the above example, the name of this
+			table is "testITEM", and this table includes three columns:
+
+			(ITEMTBID INTEGER PRIMARY KEY, ITEM INT NOT NULL,PATTERNID INT NOT NULL,
+			FOREIGN KEY(PATTERNID) REFERENCES FP_table(PATTERNID));
+
+			ITEMTBID : id for each row
+
+			ITEM : one appeared item in the "current pattern"
+
+			PATTERNID : (foreign key) point to the id of the "current pattern" which
+			include this item.
+		</help>
+	</operator>
+
+
+
 	<operator>
 		<name>test</name>
 		<synopsis>test it</synopsis>
