@@ -1,7 +1,7 @@
 /*
- *  RapidMiner
+ *  RapidMiner - Plugin PLCM
  *
- *  Copyright (C) 2001-2009 by Rapid-I and the contributors
+ *  Copyright 2014, Jiang Wu, Etienne Dublé, Alexandre Termier, Martin Kirchgessner, Vincent Leroy, LIG laboratory, University of Grenoble-Alpes and CNRS
  *
  *  Complete list of developers available at our web site:
  *

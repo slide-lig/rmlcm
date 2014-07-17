@@ -41,7 +41,7 @@ public class RMReaderWithComposer extends Operator {
 
 	private static final String FILE = "Identifier-File";
 
-	private static final String USE_REGEX = "Use special separator";
+	private static final String USE_REGEX = "Special separator (Default: blank space)";
 	private static final String REGEX = "File-Separator ";
 
 	private boolean useregex = false;

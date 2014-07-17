@@ -35,8 +35,8 @@ public class RMComposer extends Operator {
 
 	public RMComposer(OperatorDescription description) {
 		super(description);
-		tpinput.addPrecondition(new SimplePrecondition(tpinput, new MetaData(
-				ResultListIOObject.class)));
+//		tpinput.addPrecondition(new SimplePrecondition(tpinput, new MetaData(
+//				ResultListIOObject.class)));
 	}
 
 	public void doWork() throws OperatorException {

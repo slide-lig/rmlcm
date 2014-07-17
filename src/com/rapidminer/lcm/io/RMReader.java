@@ -49,7 +49,7 @@ public class RMReader extends Operator implements FIMIReader {
 
 	// private static final String testFile = "test";
 
-	private static final String useRegex = "Special Separator";
+	private static final String useRegex = "Special Separator (default: blank space)";
 	private static final String regex = "regex";
 
 	// private InputPort prinput = this.getInputPorts().createPort("in");

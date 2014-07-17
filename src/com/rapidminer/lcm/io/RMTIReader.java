@@ -70,7 +70,7 @@ public class RMTIReader extends Operator implements FIMIReader {
 
 	// private ArrayList<String> list = new ArrayList<String>();
 
-	private static final String useRegex = "Special Separator";
+	private static final String useRegex = "Special Separator (default: blank space)";
 	private static final String regex = "regex";
 
 	private RMTransactions transactions;

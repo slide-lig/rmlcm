@@ -1,5 +1,6 @@
 package com.rapidminer.lcm.io;
 
+import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -7,6 +8,7 @@ import java.sql.Statement;
 import java.util.Arrays;
 import java.util.List;
 
+import com.rapidminer.lcm.exceptions.WrongDatabasePathException;
 import com.rapidminer.lcm.obj.ResultListIOObject;
 import com.rapidminer.operator.Operator;
 import com.rapidminer.operator.OperatorDescription;
@@ -17,7 +19,7 @@ import com.rapidminer.parameter.ParameterTypeString;
 
 public class RMSQLiteWriter extends Operator {
 
-	private static final String dbname = "database name";
+	private static final String dbname = "database path";
 	private static final String tablename = "table name";
 
 	private InputPort input = this.getInputPorts().createPort("input");
@@ -26,7 +28,6 @@ public class RMSQLiteWriter extends Operator {
 
 	public RMSQLiteWriter(OperatorDescription description) {
 		super(description);
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override
@@ -76,12 +77,18 @@ public class RMSQLiteWriter extends Operator {
 	}
 
 	public void createTables(Connection c, String nameofdb, String nameoftbfp,
-			String nameoftbitem) {
+			String nameoftbitem) throws WrongDatabasePathException {
 
 		Statement stmt = null;
-
+		
 		try {
 			c = DriverManager.getConnection("jdbc:sqlite:" + nameofdb + ".db");
+		} catch (SQLException e1) {
+			throw new WrongDatabasePathException("Please check your database path!");
+			//e1.printStackTrace();
+		}
+		
+		try {
 
 			stmt = c.createStatement();
 
@@ -103,9 +110,9 @@ public class RMSQLiteWriter extends Operator {
 					+ nameoftbitem
 					+ "(ITEM INT NOT NULL,PATTERNID INT NOT NULL, FOREIGN KEY(PATTERNID) REFERENCES "
 					+ nameoftbfp + "(PATTERNID));";
-			
-			//System.out.println(itemtbsql);
-			
+
+			// System.out.println(itemtbsql);
+
 			stmt.execute(itemtbsql);
 
 			stmt.close();
@@ -142,8 +149,8 @@ public class RMSQLiteWriter extends Operator {
 				// System.out.println(support + " " + patternString);
 
 				sql = "INSERT INTO " + nameoftbfp
-						+ " (PATTERNID,SUPPORT,PATTERNDESCRIPTION) VALUES (" + fpid + ","
-						+ support + ",('" + patternString + "'));";
+						+ " (PATTERNID,SUPPORT,PATTERNDESCRIPTION) VALUES ("
+						+ fpid + "," + support + ",('" + patternString + "'));";
 
 				// System.out.println(sql);
 
@@ -330,9 +337,11 @@ public class RMSQLiteWriter extends Operator {
 	public List<ParameterType> getParameterTypes() {
 		List<ParameterType> types = super.getParameterTypes();
 
-		types.add(new ParameterTypeString(dbname, "Name of Database", "res"));
+		types.add(new ParameterTypeString(dbname, "Name of Database",
+				"D:\\database", false));
 
-		types.add(new ParameterTypeString(tablename, "Name of table", "tbl"));
+		types.add(new ParameterTypeString(tablename, "Name of table", "tbl",
+				false));
 
 		return types;
 	}

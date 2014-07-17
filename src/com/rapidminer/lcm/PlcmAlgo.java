@@ -12,6 +12,7 @@ import com.rapidminer.example.table.DataRow;
 import com.rapidminer.example.table.DataRowFactory;
 import com.rapidminer.example.table.MemoryExampleTable;
 import com.rapidminer.lcm.exceptions.NoMatchedPatternsException;
+import com.rapidminer.lcm.exceptions.UndefinedSupportException;
 import com.rapidminer.lcm.internals.transactions.RMTransactions;
 import com.rapidminer.lcm.io.MultiThreadedFileCollector;
 import com.rapidminer.lcm.io.PatternsCollector;
@@ -55,7 +56,7 @@ public class PlcmAlgo extends Operator {
 	private static final String results = "Result File Location";
 
 	private static final String useThread = "Thread usage";
-	private static final String threads = "Threads number";
+	private static final String threads = "Number of threads";
 
 	private static final String memoryWatch = "Peak memory usage";
 
@@ -100,6 +101,13 @@ public class PlcmAlgo extends Operator {
 			// arguments[0] = this.getParameter(operation);
 			// arguments[1] = this.getParameter(dataset);
 			support = this.getParameter(threshold);
+			if (support.equals(null) || support == "" || support == "\\s"
+					|| support.isEmpty() || support == null
+					|| support.equals("0")) {
+				throw new UndefinedSupportException("Support Error!");
+			} else {
+				support = this.getParameter(threshold);
+			}
 
 			writeFile = this.getParameterAsBoolean(beginWriteFile);
 
@@ -136,7 +144,7 @@ public class PlcmAlgo extends Operator {
 			} catch (NoMatchedPatternsException e) {
 				e.errorDialog();
 			}
-			
+
 			if (transformerOutput.isConnected()) {
 				ResultListIOObject resultlist = new ResultListIOObject(
 						PLCM.getResList(), Integer.valueOf(support));
@@ -165,7 +173,7 @@ public class PlcmAlgo extends Operator {
 		ParameterType threadsType = new ParameterTypeInt(
 				threads,
 				"How many threads will be launched (defaults to your machine's processors count)",
-				1, 4, 1, false);
+				1, 4, 1, true);
 
 		types.add(new ParameterTypeBoolean(
 				memoryWatch,
@@ -182,7 +190,7 @@ public class PlcmAlgo extends Operator {
 				"Enable ultra-verbose mode, which logs every pattern extension (use with care: it may produce a LOT of output)",
 				false, false));
 
-		types.add(new ParameterTypeString(threshold, "threshold", "1", false));
+		types.add(new ParameterTypeString(threshold, "threshold", true));
 
 		types.add(new ParameterTypeBoolean(
 				beginWriteFile,
@@ -190,7 +198,7 @@ public class PlcmAlgo extends Operator {
 				false, false));
 
 		ParameterType outFileType = new ParameterTypeString(results,
-				"Location of output file(s) that you want to generate", false);
+				"Location of output file(s) that you want to generate", true);
 
 		outFileType.registerDependencyCondition(new BooleanParameterCondition(
 				this, beginWriteFile, true, true));

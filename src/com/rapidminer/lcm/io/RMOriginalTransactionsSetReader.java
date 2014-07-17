@@ -40,7 +40,7 @@ public class RMOriginalTransactionsSetReader extends Operator implements
 
 	private static final String FILE_LOCATION = "file";
 
-	private static final String useRegex = "Special Separator";
+	private static final String useRegex = "Special Separator (default: blank space)";
 	private static final String regex = "regex";
 
 	private OutputPort output = this.getOutputPorts().createPort("out");
@@ -65,7 +65,7 @@ public class RMOriginalTransactionsSetReader extends Operator implements
 		if (stdoutput.isConnected()) {
 			stdoutput.deliver(this.showOriginalStringData(transactions));
 		}
-		
+
 		output.deliver(this.transactions);
 
 		long lEndTime = System.currentTimeMillis();
