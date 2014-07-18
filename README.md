@@ -18,8 +18,8 @@ Contributors:
 - Vincent Leroy
 - Martin Kirchgessner
 
-**For more details, please see rmlcm**
-**[RMLCM Wiki](https://github.com/slide-lig/rmlcm/wiki)!**
+**For more details, please see rmlcm:**
+##**[RMLCM Wiki](https://github.com/slide-lig/rmlcm/wiki)!**
 
 ***
 
