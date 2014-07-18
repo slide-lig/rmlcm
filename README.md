@@ -7,11 +7,11 @@ As for this project, The PLCM algorithme is implemented as a plugin in Rapidmine
 **Key word: Pattern mining, Multicore, Rapidminer**
 
 Contributors:
-Etienne Dublé
-Alexandre Termier
-Jiang Wu
-Vincent Leroy
-Martin Kirchgessner
+-Etienne Dublé
+-Alexandre Termier
+-Jiang Wu
+-Vincent Leroy
+-Martin Kirchgessner
 
 For more details, please see rmlcm [wiki](https://github.com/slide-lig/rmlcm/wiki)!
 
