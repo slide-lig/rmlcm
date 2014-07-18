@@ -6,6 +6,7 @@ PLCM plguin for Rapidminer
 ***
 
 As for this project, The PLCM algorithme is implemented as a plugin in Rapidminer. It makes the usage of PLCM algorithme easier. 
+
 **Key word: Pattern mining, Multicore, Rapidminer**
 
 ***
@@ -17,7 +18,8 @@ Contributors:
 - Vincent Leroy
 - Martin Kirchgessner
 
-**For more details, please see rmlcm [wiki](https://github.com/slide-lig/rmlcm/wiki)!**
+**For more details, please see rmlcm**
+**[RMLCM Wiki](https://github.com/slide-lig/rmlcm/wiki)!**
 
 ***
 
