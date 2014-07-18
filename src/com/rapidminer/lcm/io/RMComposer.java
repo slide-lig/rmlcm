@@ -24,8 +24,8 @@ import com.rapidminer.tools.Ontology;
 
 public class RMComposer extends Operator {
 
-	private InputPort matcherinput = this.getInputPorts().createPort(
-			"identify map input");
+	private InputPort map = this.getInputPorts().createPort(
+			"map input");
 	// The input can be RMTransactions or ResultListIOObject(output of PLCM)
 	private InputPort tpinput = this.getInputPorts().createPort(
 			"data of transactions or results");
@@ -48,7 +48,7 @@ public class RMComposer extends Operator {
 		long lStartTime = System.currentTimeMillis();
 		ResultListIOObject resultList = tpinput
 				.getData(ResultListIOObject.class);
-		IdentifyHashMapIOObject identifyMap = matcherinput
+		IdentifyHashMapIOObject identifyMap = map
 				.getData(IdentifyHashMapIOObject.class);
 
 		output.deliver(this.transformResultTransactionsAsString(resultList,

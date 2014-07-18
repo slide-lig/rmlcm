@@ -147,7 +147,9 @@ public class PLCM {
 	public String toString(Map<String, Long> additionalCounters) {
 		StringBuilder builder = new StringBuilder();
 
-		builder.append("{\"name\":\"PLCM\", \"threads\":");
+		builder.append("name : PLCM");
+		builder.append("\n");
+		builder.append("threads : ");
 		builder.append(this.threads.size());
 
 		PLCMCounters[] counters = PLCMCounters.values();
@@ -155,24 +157,24 @@ public class PLCM {
 		for (int i = 0; i < this.globalCounters.length; i++) {
 			PLCMCounters counter = counters[i];
 
-			builder.append(", \"");
+			//builder.append(", \"");
 			builder.append("\n");
 			builder.append(counter.toString());
-			builder.append("\":");
+			builder.append(" : ");
 			builder.append(this.globalCounters[i]);
 		}
 
 		if (additionalCounters != null) {
 			for (Entry<String, Long> entry : additionalCounters.entrySet()) {
-				builder.append(", \"");
+				//builder.append(", ");
 				builder.append("\n");
 				builder.append(entry.getKey());
-				builder.append("\":");
+				builder.append(" : ");
 				builder.append(entry.getValue());
 			}
 		}
 
-		builder.append('}');
+		//builder.append('}');
 
 		return builder.toString();
 	}

@@ -31,7 +31,7 @@ public class RMDecomposer extends Operator {
 	private OutputPort intTransactionOutput = this.getOutputPorts().createPort(
 			"out");
 	private OutputPort matchedOutput = this.getOutputPorts()
-			.createPort("match");
+			.createPort("map");
 	private OutputPort stdoutput = this.getOutputPorts().createPort(
 			"orginal data");
 
