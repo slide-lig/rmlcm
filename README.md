@@ -11,17 +11,17 @@ As for this project, The PLCM algorithme is implemented as a plugin in Rapidmine
 
 ***
 
-> [1. Installation](https://github.com/slide-lig/rmlcm/wiki/Installation)
+[1. Installation](https://github.com/slide-lig/rmlcm/wiki/Installation)
 
-> [2. Getting started](https://github.com/slide-lig/rmlcm/wiki/Getting-started) (optional, for first time Rapidminer users)
+[2. Getting started](https://github.com/slide-lig/rmlcm/wiki/Getting-started) (optional, for first time Rapidminer users)
 
-> [3. How to use LCM plugin](https://github.com/slide-lig/rmlcm/wiki/How-to-use)
+[3. How to use LCM plugin](https://github.com/slide-lig/rmlcm/wiki/How-to-use)
 
-> [4. Dataset](https://github.com/slide-lig/rmlcm/wiki/Dataset)
+[4. Dataset](https://github.com/slide-lig/rmlcm/wiki/Dataset)
 
-> [5. Operators](https://github.com/slide-lig/rmlcm/wiki/Operators)
+[5. Operators](https://github.com/slide-lig/rmlcm/wiki/Operators)
 
-> [6. Developers](https://github.com/slide-lig/rmlcm/wiki/Development)
+[6. Developers](https://github.com/slide-lig/rmlcm/wiki/Development)
 
 
 ##**For more details, please see rmlcm: [Wiki](https://github.com/slide-lig/rmlcm/wiki)**
