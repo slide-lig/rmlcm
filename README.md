@@ -11,15 +11,6 @@ As for this project, The PLCM algorithme is implemented as a plugin in Rapidmine
 
 ***
 
-Contributors:
-- Etienne Dublé
-- Alexandre Termier
-- Jiang Wu
-- Vincent Leroy
-- Martin Kirchgessner
-
-***
-
 > > [1. Installation](https://github.com/slide-lig/rmlcm/wiki/Installation)
 
 > > [2. Getting started](https://github.com/slide-lig/rmlcm/wiki/Getting-started) (optional, for first time Rapidminer users)
@@ -33,8 +24,16 @@ Contributors:
 > > [6. Developers](https://github.com/slide-lig/rmlcm/wiki/Development)
 
 
-**For more details, please see rmlcm:**
-##**[Wiki](https://github.com/slide-lig/rmlcm/wiki)!**
+##**For more details, please see rmlcm: [Wiki](https://github.com/slide-lig/rmlcm/wiki)**
+
+***
+
+Contributors:
+- Etienne Dublé
+- Alexandre Termier
+- Jiang Wu
+- Vincent Leroy
+- Martin Kirchgessner
 
 ***
 
