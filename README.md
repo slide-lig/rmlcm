@@ -1,4 +1,4 @@
-PLCM plguin for Rapidminer
+PLCM plugin for Rapidminer
 ===========================
 
 *PLCM is a frequent itemset mining algorithm based on the LCM algorithm, it discovers Closed Frequent Itemsets on multicore.*
@@ -29,9 +29,9 @@ As for this project, The PLCM algorithm is implemented as a plugin in Rapidminer
 ***
 
 Contributors:
+- Jiang Wu
 - Etienne Dublé
 - Alexandre Termier
-- Jiang Wu
 - Vincent Leroy
 - Martin Kirchgessner
 
